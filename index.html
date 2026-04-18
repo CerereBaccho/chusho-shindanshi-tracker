@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>中小企業診断士 学習トラッカー</title>
+  <meta name="description" content="中小企業診断士試験の学習を管理するトラッカー。平日22:00-23:00の1時間学習・2年計画対応。">
+  <style>
+    :root {
+      --bg: #ffffff;
+      --bg2: #f4f4f5;
+      --bg3: #e4e4e7;
+      --text: #18181b;
+      --text2: #71717a;
+      --accent: #2563eb;
+      --accent-light: #dbeafe;
+      --accent-text: #1d4ed8;
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --border: #e4e4e7;
+      --radius: 10px;
+      --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #09090b;
+        --bg2: #18181b;
+        --bg3: #27272a;
+        --text: #fafafa;
+        --text2: #a1a1aa;
+        --accent: #3b82f6;
+        --accent-light: #172554;
+        --accent-text: #93c5fd;
+        --success: #22c55e;
+        --success-light: #052e16;
+        --border: #27272a;
+      }
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Yu Gothic UI', 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .app { max-width: 680px; margin: 0 auto; padding: 1rem; }
+
+    /* Header */
+    .header { padding: 0.75rem 0 1rem; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+    .header h1 { font-size: 17px; font-weight: 600; }
+    .header p { font-size: 12px; color: var(--text2); margin-top: 3px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 3px; margin-bottom: 1.25rem; background: var(--bg2); border-radius: var(--radius); padding: 3px; }
+    .tab { flex: 1; padding: 7px 4px; text-align: center; font-size: 13px; border: none; background: none; color: var(--text2); border-radius: 8px; cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s; }
+    .tab.active { background: var(--bg); color: var(--text); font-weight: 500; box-shadow: var(--shadow); }
+    .tab:hover:not(.active) { color: var(--text); }
+
+    /* Phase card */
+    .phase-card { background: var(--bg2); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .phase-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
+    .phase-name { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+    .phase-sub { font-size: 12px; color: var(--text2); }
+    .phase-progress { margin-top: 10px; }
+    .progress-bar-bg { background: var(--bg3); border-radius: 4px; height: 6px; overflow: hidden; }
+    .progress-bar-fill { background: var(--accent); height: 100%; border-radius: 4px; transition: width 0.4s; }
+    .progress-pct { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+    /* Metrics */
+    .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1rem; }
+    .metric { background: var(--bg2); border-radius: var(--radius); padding: 0.75rem 1rem; }
+    .metric-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+    .metric-val { font-size: 22px; font-weight: 600; line-height: 1.2; }
+
+    /* Nav */
+    .nav { display: flex; gap: 8px; align-items: center; margin-bottom: 1rem; }
+    .nav-date { flex: 1; text-align: center; font-size: 14px; font-weight: 500; }
+
+    /* Tips */
+    .tips { background: var(--accent-light); border-radius: var(--radius); padding: 10px 12px; font-size: 12px; color: var(--accent-text); margin-bottom: 1rem; line-height: 1.5; }
+
+    /* Weekend banner */
+    .weekend-banner { background: var(--success-light); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--success); margin-bottom: 1rem; line-height: 1.6; }
+    .weekend-banner strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+    /* Section label */
+    .section-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; font-weight: 500; }
+
+    /* Tasks */
+    .todo-list { margin-bottom: 1rem; }
+    .todo { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 8px; display: flex; gap: 12px; align-items: flex-start; }
+    .todo.done { opacity: 0.5; }
+    .todo.manual { border-style: dashed; border-color: var(--accent); }
+    .todo input[type="checkbox"] { margin-top: 2px; flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; accent-color: var(--accent); }
+    .todo-body { flex: 1; min-width: 0; }
+    .todo-title { font-size: 14px; font-weight: 500; margin-bottom: 2px; }
+    .todo.done .todo-title { text-decoration: line-through; }
+    .todo-meta { font-size: 12px; color: var(--text2); margin-bottom: 5px; }
+    .todo-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .todo-link { font-size: 12px; color: var(--accent); text-decoration: none; }
+    .todo-link:hover { text-decoration: underline; }
+    .todo-del { font-size: 11px; color: var(--text2); background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
+    .todo-del:hover { color: #dc2626; }
+
+    /* Manual task form */
+    .add-task-form { background: var(--bg2); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 1.25rem; }
+    .form-grid { display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom: 6px; }
+    .form-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .form-row:last-child { margin-bottom: 0; }
+    input[type="text"], input[type="url"], input[type="number"], input[type="date"], input[type="time"] {
+      padding: 6px 10px; font-size: 13px; border: 1px solid var(--border); border-radius: 7px;
+      background: var(--bg); color: var(--text); font-family: inherit; width: 100%;
+    }
+    input[type="number"] { width: auto; }
+    input::placeholder { color: var(--text2); }
+
+    /* Time recorder */
+    .time-section { border-top: 1px solid var(--border); padding-top: 1rem; margin-bottom: 1rem; }
+    .timer-row { display: flex; gap: 8px; align-items: center; }
+    .timer-row input { width: 80px; }
+    .log-msg { font-size: 12px; color: var(--success); }
+    .today-time { font-size: 12px; color: var(--text2); margin-top: 5px; }
+
+    /* Buttons */
+    button {
+      padding: 7px 14px; font-size: 13px; border: 1px solid var(--border);
+      border-radius: 7px; background: var(--bg); color: var(--text);
+      cursor: pointer; font-family: inherit; transition: background 0.15s, opacity 0.15s; white-space: nowrap;
+    }
+    button:hover { background: var(--bg2); }
+    button.primary { background: var(--accent); color: white; border-color: var(--accent); }
+    button.primary:hover { opacity: 0.9; background: var(--accent); }
+    button.danger { color: #dc2626; border-color: #dc2626; }
+    button.danger:hover { background: #fef2f2; }
+
+    /* Charts */
+    .chart-section { margin-bottom: 1.5rem; }
+    .chart-title { font-size: 14px; font-weight: 500; margin-bottom: 0.75rem; }
+    .bar-chart { display: flex; flex-direction: column; gap: 8px; }
+    .bar-row { display: flex; align-items: center; gap: 8px; }
+    .bar-label { font-size: 12px; color: var(--text2); width: 150px; flex-shrink: 0; text-align: right; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-wrap { flex: 1; background: var(--bg2); border-radius: 4px; height: 22px; overflow: hidden; }
+    .bar-fill { height: 100%; background: var(--accent); border-radius: 4px; display: flex; align-items: center; padding-left: 8px; min-width: 4px; transition: width 0.4s; }
+    .bar-val { font-size: 11px; color: white; white-space: nowrap; }
+
+    /* Summary table */
+    .summary-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .summary-table th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-weight: 500; color: var(--text2); font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .summary-table td { padding: 8px 10px; border-bottom: 1px solid var(--border); }
+    .summary-table tr:last-child td { border-bottom: none; }
+
+    /* Settings */
+    .settings-section { background: var(--bg2); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .settings-title { font-size: 14px; font-weight: 500; margin-bottom: 0.75rem; }
+    .settings-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .settings-row label { font-size: 13px; color: var(--text2); flex-shrink: 0; }
+    .settings-desc { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+    /* Empty */
+    .empty { text-align: center; padding: 2rem 1rem; color: var(--text2); font-size: 13px; }
+
+    /* Pages */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* Responsive */
+    @media (max-width: 400px) {
+      .metrics { grid-template-columns: repeat(3, 1fr); }
+      .metric-val { font-size: 18px; }
+      .bar-label { width: 100px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>中小企業診断士 学習トラッカー</h1>
+    <p>平日22:00-23:00の1時間学習・2026〜2028年2年計画</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('home')">ホーム</button>
+    <button class="tab" onclick="switchTab('analysis')">分析</button>
+    <button class="tab" onclick="switchTab('settings')">設定</button>
+  </div>
+
+  <!-- ======== HOME ======== -->
+  <div class="page active" id="page-home">
+    <div class="phase-card">
+      <div class="phase-label">現在のフェーズ</div>
+      <div class="phase-name" id="phase-name">学習開始日を設定してください</div>
+      <div class="phase-sub" id="phase-sub"></div>
+      <div class="phase-progress" id="phase-progress" style="display:none">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="phase-bar" style="width:0%"></div></div>
+        <div class="progress-pct" id="phase-pct"></div>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">総学習時間</div>
+        <div class="metric-val" id="total-hours">0h</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">連続学習日数</div>
+        <div class="metric-val" id="streak">0日</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">目標まで</div>
+        <div class="metric-val" id="remaining">1000h</div>
+      </div>
+    </div>
+
+    <div class="nav">
+      <button onclick="changeDate(-1)">◀ 前日</button>
+      <span class="nav-date" id="nav-date"></span>
+      <button onclick="changeDate(1)">翌日 ▶</button>
+      <button onclick="goToday()">今日</button>
+    </div>
+
+    <div class="tips" id="tip"></div>
+    <div id="weekend-section"></div>
+
+    <div class="section-label">本日のタスク</div>
+    <div class="todo-list" id="todo-list"></div>
+
+    <div class="section-label">タスクを追加 (手動)</div>
+    <div class="add-task-form">
+      <div class="form-grid">
+        <input type="text" id="new-task-title" placeholder="タスク名" />
+        <input type="number" id="new-task-time" placeholder="分" min="1" max="300" style="width:70px" />
+      </div>
+      <div class="form-row">
+        <input type="text" id="new-task-detail" placeholder="詳細（任意）" />
+      </div>
+      <div class="form-row">
+        <input type="url" id="new-task-url" placeholder="URL（任意）" />
+        <button class="primary" onclick="addManualTask()" style="flex-shrink:0">追加</button>
+      </div>
+    </div>
+
+    <div class="time-section">
+      <div class="section-label">学習時間を記録</div>
+      <div class="timer-row">
+        <input type="number" id="minutes" min="0" max="300" step="5" placeholder="分" style="width:80px" />
+        <span style="font-size: 13px; color: var(--text2);">分</span>
+        <button class="primary" onclick="logTime()">記録</button>
+        <span class="log-msg" id="log-msg"></span>
+      </div>
+      <div class="today-time" id="today-time"></div>
+    </div>
+  </div>
+
+  <!-- ======== ANALYSIS ======== -->
+  <div class="page" id="page-analysis">
+    <div class="chart-section">
+      <div class="chart-title">科目別学習時間</div>
+      <div class="bar-chart" id="subject-chart"></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">週次サマリ (直近8週)</div>
+      <div id="weekly-summary"></div>
+    </div>
+    <div class="chart-section">
+      <div class="chart-title">月次サマリ (直近6ヶ月)</div>
+      <div id="monthly-summary"></div>
+    </div>
+  </div>
+
+  <!-- ======== SETTINGS ======== -->
+  <div class="page" id="page-settings">
+    <div class="settings-section">
+      <div class="settings-title">学習開始日の設定</div>
+      <div class="settings-row">
+        <label>開始日</label>
+        <input type="date" id="start-date" style="width:auto" />
+        <button class="primary" onclick="saveStartDate()">設定</button>
+      </div>
+      <div class="settings-desc">設定した日を起点にフェーズとタスクが自動生成されます</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">リマインダー通知</div>
+      <div class="settings-row">
+        <label>通知時刻</label>
+        <input type="time" id="notif-time" value="22:00" style="width:auto" />
+        <button onclick="scheduleNotification()">通知を設定</button>
+        <button onclick="testNotification()">テスト</button>
+      </div>
+      <div class="settings-desc" id="notif-status">通知の許可が必要です</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">データエクスポート</div>
+      <div class="settings-row">
+        <button onclick="exportJSON()">JSON出力</button>
+        <button onclick="exportCSV()">CSV出力</button>
+      </div>
+      <div class="settings-desc">学習記録をファイルに保存します。Zennへの投稿や受験後の振り返りに活用できます。</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">データリセット</div>
+      <button class="danger" onclick="resetData()">全データを削除する</button>
+      <div class="settings-desc" style="margin-top:8px">この操作は元に戻せません。エクスポートで事前にバックアップすることを推奨します。</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// PHASES
+// ============================================================
+const PHASES = [
+  {
+    start: 0, end: 91, name: "財務・会計(簿記先行)", subject: "財務・会計",
+    sub: "2026年4〜6月・CPAラーニングで簿記3級→2級", weeks: 13,
+    tasks: [
+      { title: "CPAラーニング 簿記3級講義を1コマ視聴", detail: "30分の章を1つ進める", url: "https://www.cpa-learning.com/", time: 30 },
+      { title: "練習問題を解く", detail: "視聴した範囲の問題を5〜10問", time: 20 },
+      { title: "本日分の要点を1行メモ", detail: "翌朝の復習用に残す", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "簿記過去問 2時間演習セット", detail: "本番形式で解く・採点後に解説熟読", url: "https://www.cpa-learning.com/", time: 120 }
+    ]
+  },
+  {
+    start: 91, end: 182, name: "財務・会計(診断士範囲)", subject: "財務・会計",
+    sub: "2026年7〜9月・TBC速修テキスト+過去問", weeks: 13,
+    tasks: [
+      { title: "TBC速修テキスト 財務・会計を読み進める", detail: "1単元分をインプット", url: "https://www.youtube.com/@waseda-syuppan", time: 30 },
+      { title: "過去問ドットコムで該当論点を演習", detail: "5〜10問・誤答は翌日再出題", url: "https://chushoks.kakomonn.com/", time: 20 },
+      { title: "計算問題の解法手順をメモ", detail: "電卓操作も含めて記録", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "財務・会計 2時間過去問演習", detail: "A・Bランク論点を本番形式で", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 182, end: 273, name: "企業経営理論", subject: "企業経営理論",
+    sub: "2026年10〜12月・TBC速修テキスト主軸", weeks: 13,
+    tasks: [
+      { title: "TBC速修テキスト 企業経営理論を読む", detail: "1単元分・戦略/組織/マーケのいずれか", url: "https://www.youtube.com/@waseda-syuppan", time: 30 },
+      { title: "過去問ドットコム 企業経営理論", detail: "該当論点を10問", url: "https://chushoks.kakomonn.com/", time: 20 },
+      { title: "キーワード整理メモ", detail: "用語を自分の言葉で定義", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "企業経営理論 2時間過去問演習", detail: "戦略・組織・マーケを横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 273, end: 364, name: "運営管理", subject: "運営管理",
+    sub: "2027年1〜3月・生産管理+店舗販売管理", weeks: 13,
+    tasks: [
+      { title: "TBC速修テキスト 運営管理を読む", detail: "生産管理か店舗販売管理の1単元", url: "https://www.youtube.com/@waseda-syuppan", time: 30 },
+      { title: "過去問ドットコム 運営管理", detail: "該当論点を10問", url: "https://chushoks.kakomonn.com/", time: 20 },
+      { title: "実務との接点を1行メモ", detail: "IaC運用と絡む観点を書く", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "運営管理 2時間過去問演習", detail: "生産管理・店舗販売管理を横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 364, end: 455, name: "経済学・経済政策", subject: "経済学・経済政策",
+    sub: "2027年4〜6月・石川秀樹先生の速習動画が主軸", weeks: 13,
+    tasks: [
+      { title: "石川秀樹先生 速習ミクロ/マクロ経済学を視聴", detail: "1講義分を視聴", url: "https://www.youtube.com/@hidekiishikawa1430", time: 30 },
+      { title: "過去問ドットコム 経済学", detail: "該当論点を10問", url: "https://chushoks.kakomonn.com/", time: 20 },
+      { title: "グラフを手書きで再現", detail: "需給曲線・IS-LM等", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "経済学 2時間過去問演習", detail: "ミクロ・マクロを横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 455, end: 497, name: "4科目総復習・過去問演習", subject: "総復習(前半)",
+    sub: "2027年7〜8月上旬・1次試験直前期", weeks: 6,
+    tasks: [
+      { title: "過去問完全マスター 苦手論点を演習", detail: "A・Bランク論点を優先", url: "https://jissen-c.jp/", time: 40 },
+      { title: "診断協会公式過去問で本番形式", detail: "時間を測って解く", url: "https://www.lec-jp.com/shindanshi/info/download/kakomon.html", time: 20 }
+    ],
+    weekendTasks: [
+      { title: "4科目模擬試験 通しセット", detail: "本番想定・採点後に弱点整理", url: "https://www.lec-jp.com/shindanshi/info/download/kakomon.html", time: 120 }
+    ]
+  },
+  {
+    start: 497, end: 588, name: "経営情報システム", subject: "経営情報システム",
+    sub: "2027年9〜11月・インフラ実務でアドバンテージ", weeks: 13,
+    tasks: [
+      { title: "TBC速修テキスト 経営情報システム", detail: "既知分野は速読・法規系は精読", url: "https://www.youtube.com/@waseda-syuppan", time: 25 },
+      { title: "過去問ドットコム 経営情報システム", detail: "10問・解ける範囲は加速", url: "https://chushoks.kakomonn.com/", time: 25 },
+      { title: "統計/DB/セキュリティ整理", detail: "実務知識と試験範囲の差分をメモ", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "経営情報システム 2時間過去問演習", detail: "IT戦略・システム開発・セキュリティ横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 588, end: 679, name: "経営法務", subject: "経営法務",
+    sub: "2027年12〜2028年2月・用語暗記が中心", weeks: 13,
+    tasks: [
+      { title: "TBC速修テキスト 経営法務", detail: "会社法/知財/契約のいずれか", url: "https://www.youtube.com/@waseda-syuppan", time: 30 },
+      { title: "過去問ドットコム 経営法務", detail: "10問", url: "https://chushoks.kakomonn.com/", time: 20 },
+      { title: "用語カードを作る", detail: "頻出用語を自分の言葉で定義", time: 10 }
+    ],
+    weekendTasks: [
+      { title: "経営法務 2時間過去問演習", detail: "会社法・知財・契約を横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 679, end: 770, name: "中小企業経営・政策", subject: "中小企業経営・政策",
+    sub: "2028年3〜5月・ほらっちチャンネル主軸", weeks: 13,
+    tasks: [
+      { title: "ほらっちチャンネル 中小企業政策動画", detail: "1本視聴・ゴロ合わせも覚える", url: "https://www.youtube.com/@horatch_channel", time: 20 },
+      { title: "最新の中小企業白書を確認", detail: "統計の変化ポイントを押さえる", time: 20 },
+      { title: "過去問演習(参考程度)", detail: "出題形式に慣れる用途", url: "https://chushoks.kakomonn.com/", time: 20 }
+    ],
+    weekendTasks: [
+      { title: "中小企業政策 2時間過去問演習", detail: "白書・政策・補助金を横断", url: "https://chushoks.kakomonn.com/", time: 120 }
+    ]
+  },
+  {
+    start: 770, end: 840, name: "全科目総復習・過去問演習", subject: "総復習(後半)",
+    sub: "2028年6〜8月上旬・1次試験直前期", weeks: 10,
+    tasks: [
+      { title: "過去問完全マスター 全科目横断", detail: "苦手論点集中", url: "https://jissen-c.jp/", time: 30 },
+      { title: "診断協会公式過去問で本番形式", detail: "時間配分を固める", url: "https://www.lec-jp.com/shindanshi/info/download/kakomon.html", time: 30 }
+    ],
+    weekendTasks: [
+      { title: "7科目模擬試験 通しセット", detail: "本番形式・時間配分の最終確認", url: "https://www.lec-jp.com/shindanshi/info/download/kakomon.html", time: 120 }
+    ]
+  },
+  {
+    start: 840, end: 896, name: "2次試験対策(事例I〜IV)", subject: "2次試験",
+    sub: "2028年8月下旬〜10月・記述力を作る", weeks: 8,
+    tasks: [
+      { title: "事例IVの解き方(TAC)を1単元", detail: "計算問題の解法を固める", time: 30 },
+      { title: "AASダウンロードで事例I〜III過去問", detail: "与件文の読解+80-100字解答", url: "https://www.aas-clover.com/testinfo/download-2", time: 25 },
+      { title: "まとめシート流 2次対策を読む", detail: "Kindle Unlimited活用", time: 5 }
+    ],
+    weekendTasks: [
+      { title: "2次試験 事例1本 通し演習", detail: "80分計測・解答・解説の3ステップ", url: "https://www.aas-clover.com/testinfo/download-2", time: 120 }
+    ]
+  }
+];
+
+const TIPS = [
+  "前夜のタスクを翌朝6:00に5分復習すると定着率が跳ね上がります",
+  "通勤中にYouTube音声を流せるなら+30分のバッファになります",
+  "誤答は翌日必ず再出題。過去問ドットコムのログイン機能が使えます",
+  "簿記2級の範囲まで固めると財務会計が得点源になります",
+  "Zenn執筆で培った『結論先出し』の構造は2次試験にそのまま活きます",
+  "週末に2時間追加できれば2027年一発合格が射程に入ります",
+  "科目合格制度を活用し、得意科目から先に確定させる戦略も有効です",
+  "インフラエンジニアの強み(経営情報システム)は得点源として最大活用を",
+  "毎日同じ時間に学習することで脳がルーティン化され定着率が上がります"
+];
+
+// ============================================================
+// STORAGE (localStorage wrapper)
+// ============================================================
+const store = {
+  get: (k) => localStorage.getItem(k),
+  set: (k, v) => localStorage.setItem(k, v),
+  remove: (k) => localStorage.removeItem(k),
+  keys: (prefix) => {
+    const out = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k.startsWith(prefix)) out.push(k);
+    }
+    return out;
+  },
+  clear: () => localStorage.clear()
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let viewDate = new Date();
+viewDate.setHours(0, 0, 0, 0);
+let currentTab = 'home';
+
+// ============================================================
+// UTILS
+// ============================================================
+function dateKey(d) {
+  return d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+}
+
+function formatDate(d) {
+  const w = ['日', '月', '火', '水', '木', '金', '土'][d.getDay()];
+  return `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}(${w})`;
+}
+
+function daysSince(startStr) {
+  const s = new Date(startStr);
+  s.setHours(0, 0, 0, 0);
+  return Math.floor((viewDate - s) / 86400000);
+}
+
+function getPhase(dayIdx) {
+  return PHASES.find(p => dayIdx >= p.start && dayIdx < p.end) || null;
+}
+
+function isWeekend(d) { return d.getDay() === 0 || d.getDay() === 6; }
+
+function loadDayState(d) {
+  const raw = store.get('day:' + dateKey(d));
+  const def = { done: [], minutes: 0, manualTasks: [] };
+  if (!raw) return def;
+  try {
+    const s = JSON.parse(raw);
+    return { done: s.done || [], minutes: s.minutes || 0, manualTasks: s.manualTasks || [] };
+  } catch { return def; }
+}
+
+function saveDayState(d, state) {
+  store.set('day:' + dateKey(d), JSON.stringify(state));
+}
+
+function computeTotals() {
+  let totalMin = 0, streak = 0;
+  for (const k of store.keys('day:')) {
+    try { totalMin += JSON.parse(store.get(k)).minutes || 0; } catch {}
+  }
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  for (let i = 0; i < 730; i++) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const raw = store.get('day:' + dateKey(d));
+    if (!raw) break;
+    try {
+      const s = JSON.parse(raw);
+      if ((s.minutes || 0) > 0 || (s.done && s.done.length > 0) || (s.manualTasks || []).some(t => t.done)) {
+        streak++;
+      } else break;
+    } catch { break; }
+  }
+  return { totalMin, streak };
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function changeDate(delta) { viewDate.setDate(viewDate.getDate() + delta); render(); }
+function goToday() { viewDate = new Date(); viewDate.setHours(0, 0, 0, 0); render(); }
+
+function switchTab(tab) {
+  currentTab = tab;
+  const tabs = ['home', 'analysis', 'settings'];
+  document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', tabs[i] === tab));
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.getElementById('page-' + tab).classList.add('active');
+  if (tab === 'analysis') renderAnalysis();
+}
+
+// ============================================================
+// TASKS
+// ============================================================
+function toggleTask(idx) {
+  const state = loadDayState(viewDate);
+  const i = state.done.indexOf(idx);
+  if (i >= 0) state.done.splice(i, 1); else state.done.push(idx);
+  saveDayState(viewDate, state);
+  render();
+}
+
+function toggleManualTask(idx) {
+  const state = loadDayState(viewDate);
+  if (state.manualTasks[idx]) state.manualTasks[idx].done = !state.manualTasks[idx].done;
+  saveDayState(viewDate, state);
+  render();
+}
+
+function deleteManualTask(idx) {
+  if (!confirm('このタスクを削除しますか?')) return;
+  const state = loadDayState(viewDate);
+  state.manualTasks.splice(idx, 1);
+  saveDayState(viewDate, state);
+  render();
+}
+
+function addManualTask() {
+  const title = document.getElementById('new-task-title').value.trim();
+  const time = parseInt(document.getElementById('new-task-time').value) || 60;
+  const detail = document.getElementById('new-task-detail').value.trim();
+  const url = document.getElementById('new-task-url').value.trim();
+  if (!title) { document.getElementById('new-task-title').focus(); return; }
+  const state = loadDayState(viewDate);
+  state.manualTasks.push({ title, time, detail, url, done: false });
+  saveDayState(viewDate, state);
+  ['new-task-title', 'new-task-time', 'new-task-detail', 'new-task-url'].forEach(id => document.getElementById(id).value = '');
+  render();
+}
+
+// ============================================================
+// TIME LOG
+// ============================================================
+function logTime() {
+  const mins = parseInt(document.getElementById('minutes').value, 10);
+  if (!mins || mins <= 0) return;
+  const state = loadDayState(viewDate);
+  state.minutes = (state.minutes || 0) + mins;
+  saveDayState(viewDate, state);
+  document.getElementById('minutes').value = '';
+  const msg = document.getElementById('log-msg');
+  msg.textContent = `+${mins}分 記録しました`;
+  setTimeout(() => { msg.textContent = ''; }, 2500);
+  render();
+}
+
+// ============================================================
+// SETTINGS ACTIONS
+// ============================================================
+function saveStartDate() {
+  const val = document.getElementById('start-date').value;
+  if (!val) return;
+  store.set('start-date', val);
+  render();
+}
+
+function resetData() {
+  if (!confirm('全ての学習データを消去します。この操作は元に戻せません。よろしいですか?')) return;
+  store.clear();
+  document.getElementById('start-date').value = '';
+  render();
+}
+
+function exportJSON() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    data[k] = localStorage.getItem(k);
+  }
+  download(JSON.stringify(data, null, 2), `study-log-${dateKey(new Date())}.json`, 'application/json');
+}
+
+function exportCSV() {
+  const rows = [['日付', '学習時間(分)', '自動タスク完了数', '手動タスク完了数']];
+  for (const k of store.keys('day:').sort()) {
+    try {
+      const s = JSON.parse(store.get(k));
+      const d = k.replace('day:', '');
+      rows.push([d, s.minutes || 0, (s.done || []).length, (s.manualTasks || []).filter(t => t.done).length]);
+    } catch {}
+  }
+  download('\uFEFF' + rows.map(r => r.join(',')).join('\n'), `study-log-${dateKey(new Date())}.csv`, 'text/csv;charset=utf-8');
+}
+
+function download(content, filename, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+let notifInterval = null;
+
+function updateNotifStatus() {
+  const el = document.getElementById('notif-status');
+  if (!('Notification' in window)) { el.textContent = 'このブラウザは通知をサポートしていません'; return; }
+  const t = store.get('notif-time') || '22:00';
+  if (Notification.permission === 'granted' && store.get('notif-enabled')) {
+    el.textContent = `通知設定済み: 毎日 ${t} に通知します`;
+  } else if (Notification.permission === 'denied') {
+    el.textContent = 'ブラウザで通知がブロックされています。ブラウザ設定から許可してください。';
+  } else {
+    el.textContent = '「通知を設定」ボタンで許可を求めます';
+  }
+}
+
+async function scheduleNotification() {
+  if (!('Notification' in window)) return;
+  const t = document.getElementById('notif-time').value || '22:00';
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    store.set('notif-time', t);
+    store.set('notif-enabled', '1');
+    setupNotifTimer();
+  }
+  updateNotifStatus();
+}
+
+function testNotification() {
+  if (Notification.permission !== 'granted') { scheduleNotification(); return; }
+  new Notification('中小企業診断士 学習トラッカー', { body: '学習の時間です！今日のタスクを確認しましょう。' });
+}
+
+function setupNotifTimer() {
+  if (notifInterval) clearInterval(notifInterval);
+  if (store.get('notif-enabled') !== '1') return;
+  const [h, m] = (store.get('notif-time') || '22:00').split(':').map(Number);
+  notifInterval = setInterval(() => {
+    if (Notification.permission !== 'granted') return;
+    const now = new Date();
+    if (now.getHours() === h && now.getMinutes() === m && now.getSeconds() < 30) {
+      new Notification('中小企業診断士 学習トラッカー', { body: '学習の時間です！今日のタスクを確認しましょう。' });
+    }
+  }, 30000);
+}
+
+// ============================================================
+// ANALYSIS
+// ============================================================
+function renderAnalysis() {
+  renderSubjectChart();
+  renderWeeklySummary();
+  renderMonthlySummary();
+}
+
+function getSubjectMinutes() {
+  const map = {};
+  PHASES.forEach(p => { map[p.subject] = 0; });
+  const startStr = store.get('start-date');
+  if (!startStr) return map;
+  const start = new Date(startStr); start.setHours(0, 0, 0, 0);
+  for (const k of store.keys('day:')) {
+    try {
+      const s = JSON.parse(store.get(k));
+      if (!s.minutes) continue;
+      const ds = k.replace('day:', '');
+      const d = new Date(`${ds.slice(0,4)}-${ds.slice(4,6)}-${ds.slice(6,8)}`);
+      d.setHours(0, 0, 0, 0);
+      const dayIdx = Math.floor((d - start) / 86400000);
+      const phase = getPhase(dayIdx);
+      if (phase) map[phase.subject] = (map[phase.subject] || 0) + s.minutes;
+    } catch {}
+  }
+  return map;
+}
+
+function renderSubjectChart() {
+  const el = document.getElementById('subject-chart');
+  const map = getSubjectMinutes();
+  const maxVal = Math.max(...Object.values(map), 1);
+  el.innerHTML = '';
+  for (const [subj, mins] of Object.entries(map)) {
+    const pct = (mins / maxVal * 100).toFixed(1);
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label">${subj}</div>
+      <div class="bar-wrap">
+        <div class="bar-fill" style="width:${pct}%">
+          <span class="bar-val">${(mins/60).toFixed(1)}h</span>
+        </div>
+      </div>`;
+    el.appendChild(row);
+  }
+}
+
+function renderWeeklySummary() {
+  const el = document.getElementById('weekly-summary');
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  const dow = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - (dow === 0 ? 6 : dow - 1));
+
+  let html = '<table class="summary-table"><thead><tr><th>期間</th><th>学習時間</th><th>完了タスク</th><th>学習日数</th></tr></thead><tbody>';
+  for (let w = 0; w < 8; w++) {
+    const ws = new Date(monday); ws.setDate(monday.getDate() - w * 7);
+    let totalMin = 0, totalTasks = 0, studyDays = 0;
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(ws); day.setDate(ws.getDate() + d);
+      const raw = store.get('day:' + dateKey(day));
+      if (!raw) continue;
+      try {
+        const s = JSON.parse(raw);
+        if ((s.minutes || 0) > 0 || (s.done && s.done.length > 0)) {
+          totalMin += s.minutes || 0;
+          totalTasks += (s.done || []).length + (s.manualTasks || []).filter(t => t.done).length;
+          studyDays++;
+        }
+      } catch {}
+    }
+    const label = w === 0 ? '今週' : `${w}週前`;
+    html += `<tr><td>${label}</td><td>${(totalMin/60).toFixed(1)}h</td><td>${totalTasks}件</td><td>${studyDays}日</td></tr>`;
+  }
+  el.innerHTML = html + '</tbody></table>';
+}
+
+function renderMonthlySummary() {
+  const el = document.getElementById('monthly-summary');
+  const today = new Date();
+  let html = '<table class="summary-table"><thead><tr><th>月</th><th>学習時間</th><th>完了タスク</th><th>学習日数</th></tr></thead><tbody>';
+  for (let m = 0; m < 6; m++) {
+    const d = new Date(today.getFullYear(), today.getMonth() - m, 1);
+    const y = d.getFullYear(), mo = d.getMonth();
+    let totalMin = 0, totalTasks = 0, studyDays = 0;
+    const daysInMonth = new Date(y, mo + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dt = new Date(y, mo, day);
+      const raw = store.get('day:' + dateKey(dt));
+      if (!raw) continue;
+      try {
+        const s = JSON.parse(raw);
+        if ((s.minutes || 0) > 0 || (s.done && s.done.length > 0)) {
+          totalMin += s.minutes || 0;
+          totalTasks += (s.done || []).length + (s.manualTasks || []).filter(t => t.done).length;
+          studyDays++;
+        }
+      } catch {}
+    }
+    html += `<tr><td>${y}年${mo+1}月</td><td>${(totalMin/60).toFixed(1)}h</td><td>${totalTasks}件</td><td>${studyDays}日</td></tr>`;
+  }
+  el.innerHTML = html + '</tbody></table>';
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function render() {
+  document.getElementById('nav-date').textContent = formatDate(viewDate);
+  document.getElementById('tip').textContent = TIPS[Math.floor(Math.random() * TIPS.length)];
+
+  const totals = computeTotals();
+  const hours = totals.totalMin / 60;
+  document.getElementById('total-hours').textContent = hours.toFixed(1) + 'h';
+  document.getElementById('streak').textContent = totals.streak + '日';
+  document.getElementById('remaining').textContent = Math.max(0, Math.round(1000 - hours)) + 'h';
+
+  const startStr = store.get('start-date');
+  const list = document.getElementById('todo-list');
+
+  if (!startStr) {
+    list.innerHTML = '<div class="empty">学習開始日を「設定」タブから設定するとタスクが生成されます</div>';
+    document.getElementById('phase-name').textContent = '学習開始日を設定してください';
+    document.getElementById('phase-sub').textContent = '';
+    document.getElementById('phase-progress').style.display = 'none';
+    document.getElementById('weekend-section').innerHTML = '';
+    document.getElementById('today-time').textContent = '';
+    return;
+  }
+
+  const dayIdx = daysSince(startStr);
+  if (dayIdx < 0) {
+    list.innerHTML = '<div class="empty">開始日前です</div>';
+    document.getElementById('phase-name').textContent = '開始前';
+    document.getElementById('phase-sub').textContent = '';
+    document.getElementById('phase-progress').style.display = 'none';
+    document.getElementById('weekend-section').innerHTML = '';
+    return;
+  }
+
+  const phase = getPhase(dayIdx);
+  if (!phase) {
+    list.innerHTML = '<div class="empty">全スケジュール完了です。お疲れ様でした!</div>';
+    document.getElementById('phase-name').textContent = '計画完了';
+    document.getElementById('phase-sub').textContent = '';
+    document.getElementById('phase-progress').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('phase-name').textContent = phase.name;
+  const dayInPhase = dayIdx - phase.start + 1;
+  const totalDays = phase.end - phase.start;
+  document.getElementById('phase-sub').textContent = `${phase.sub} ・ ${dayInPhase}/${totalDays}日目`;
+  const pct = Math.round(dayInPhase / totalDays * 100);
+  document.getElementById('phase-progress').style.display = 'block';
+  document.getElementById('phase-bar').style.width = pct + '%';
+  document.getElementById('phase-pct').textContent = `フェーズ進捗: ${pct}%`;
+
+  // Weekend tasks (F-12)
+  const ws = document.getElementById('weekend-section');
+  if (isWeekend(viewDate) && phase.weekendTasks && phase.weekendTasks.length > 0) {
+    const t = phase.weekendTasks[0];
+    const link = t.url ? ` <a href="${t.url}" target="_blank" style="color:inherit;text-decoration:underline">開く</a>` : '';
+    ws.innerHTML = `<div class="weekend-banner"><strong>週末モード: 追加の長時間タスクが利用可能です</strong>${t.title} (${t.time}分)${link}</div>`;
+  } else {
+    ws.innerHTML = '';
+  }
+
+  const state = loadDayState(viewDate);
+  list.innerHTML = '';
+
+  // Auto-generated tasks
+  phase.tasks.forEach((t, idx) => {
+    const done = state.done.includes(idx);
+    const div = document.createElement('div');
+    div.className = 'todo' + (done ? ' done' : '');
+    const link = t.url ? `<a class="todo-link" href="${t.url}" target="_blank" rel="noopener">リソースを開く ↗</a>` : '';
+    div.innerHTML = `
+      <input type="checkbox" ${done ? 'checked' : ''} />
+      <div class="todo-body">
+        <p class="todo-title">${escHtml(t.title)}</p>
+        <p class="todo-meta">${escHtml(t.detail)} ・ 目安 ${t.time}分</p>
+        <div class="todo-actions">${link}</div>
+      </div>`;
+    div.querySelector('input').addEventListener('change', () => toggleTask(idx));
+    list.appendChild(div);
+  });
+
+  // Manual tasks
+  state.manualTasks.forEach((t, idx) => {
+    const div = document.createElement('div');
+    div.className = 'todo manual' + (t.done ? ' done' : '');
+    const link = t.url ? `<a class="todo-link" href="${t.url}" target="_blank" rel="noopener">リソースを開く ↗</a>` : '';
+    div.innerHTML = `
+      <input type="checkbox" ${t.done ? 'checked' : ''} />
+      <div class="todo-body">
+        <p class="todo-title">${escHtml(t.title)} <span style="font-size:11px;color:var(--text2)">[手動]</span></p>
+        <p class="todo-meta">${escHtml(t.detail || '手動追加タスク')} ・ 目安 ${t.time}分</p>
+        <div class="todo-actions">${link}<button class="todo-del" data-idx="${idx}">削除</button></div>
+      </div>`;
+    div.querySelector('input').addEventListener('change', () => toggleManualTask(idx));
+    div.querySelector('.todo-del').addEventListener('click', () => deleteManualTask(idx));
+    list.appendChild(div);
+  });
+
+  const todayTimeEl = document.getElementById('today-time');
+  todayTimeEl.textContent = state.minutes > 0 ? `今日の記録: ${state.minutes}分 (${(state.minutes/60).toFixed(1)}h)` : '';
+
+  if (currentTab === 'analysis') renderAnalysis();
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+(function init() {
+  const saved = store.get('start-date');
+  if (saved) document.getElementById('start-date').value = saved;
+  const notifTime = store.get('notif-time');
+  if (notifTime) document.getElementById('notif-time').value = notifTime;
+  updateNotifStatus();
+  setupNotifTimer();
+  render();
+})();
+</script>
+</body>
+</html>
