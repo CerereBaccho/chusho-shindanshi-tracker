@@ -315,15 +315,51 @@
 // ============================================================
 const PHASES = [
   {
-    start: 0, end: 91, name: "財務・会計(簿記先行)", subject: "財務・会計",
-    sub: "2026年4〜6月・CPAラーニングで簿記3級→2級", weeks: 13,
+    // CPAラーニング 日商簿記3級 全23講義 15時間51分（1講義平均41分）
+    start: 0, end: 28, name: "財務・会計①3級講義", subject: "財務・会計",
+    sub: "2026年4月下旬〜5月中旬・CPAラーニング 簿記3級 全23講義", weeks: 4,
     tasks: [
-      { title: "CPAラーニング 簿記3級講義を1コマ視聴", detail: "30分の章を1つ進める", url: "https://www.cpa-learning.com/", time: 30 },
-      { title: "練習問題を解く", detail: "視聴した範囲の問題を5〜10問", time: 20 },
-      { title: "本日分の要点を1行メモ", detail: "翌朝の復習用に残す", time: 10 }
+      { title: "3級講義を1コマ視聴（全23講義）", detail: "1コマ平均41分。第1講義から順に視聴し仕訳の基礎を固める", url: "https://www.cpa-learning.com/courses/90002", time: 41 },
+      { title: "視聴範囲の問題を5問演習", detail: "テキスト問題または問題集解説で該当論点を確認", time: 19 }
     ],
     weekendTasks: [
-      { title: "簿記過去問 2時間演習セット", detail: "本番形式で解く・採点後に解説熟読", url: "https://www.cpa-learning.com/", time: 120 }
+      { title: "3級ネット試験対策を消化（全15講義・7時間7分）", detail: "週に3〜4コマを目安。試験形式に慣れる", url: "https://www.cpa-learning.com/courses/420025", time: 120 }
+    ]
+  },
+  {
+    // CPAラーニング 日商簿記3級 問題集解説 全19講義 9時間57分 / ネット模擬試験 全3講義 6時間15分
+    start: 28, end: 42, name: "財務・会計②3級仕上げ", subject: "財務・会計",
+    sub: "2026年5月中旬〜下旬・問題集解説（19講義）＋ネット模擬試験", weeks: 2,
+    tasks: [
+      { title: "3級問題集解説を1〜2コマ視聴", detail: "全19講義・9時間57分。苦手論点を重点的に再確認", url: "https://www.cpa-learning.com/courses/330002", time: 40 },
+      { title: "間違えた論点の講義を再視聴", detail: "誤答した章を10〜15分でピンポイント確認", time: 20 }
+    ],
+    weekendTasks: [
+      { title: "3級ネット模擬試験（全3本・6時間15分）を通しで解く", detail: "時間計測→採点→解説動画視聴の3ステップで定着", url: "https://www.cpa-learning.com/courses/630032", time: 120 }
+    ]
+  },
+  {
+    // CPAラーニング 日商簿記2級 商業簿記 全23講義 16時間53分（1講義平均44分）
+    start: 42, end: 70, name: "財務・会計③2級商業講義", subject: "財務・会計",
+    sub: "2026年5月下旬〜6月下旬・CPAラーニング 2級商業簿記 全23講義", weeks: 4,
+    tasks: [
+      { title: "2級商業簿記を1コマ視聴（全23講義）", detail: "1コマ平均44分。株式・税効果・連結会計など順に視聴", url: "https://www.cpa-learning.com/courses/30003", time: 44 },
+      { title: "視聴範囲の仕訳・計算問題を5問演習", detail: "商業簿記は仕訳の正確さが命。都度手を動かす", time: 16 }
+    ],
+    weekendTasks: [
+      { title: "2級商業 問題集解説を2〜3コマ視聴（全16講義・8時間4分）", detail: "週末に並行消化。解説動画で解法の型を習得", url: "https://www.cpa-learning.com/courses/360010", time: 120 }
+    ]
+  },
+  {
+    // CPAラーニング 日商簿記2級 工業簿記（登川） 全14講義 14時間22分（1講義平均61分）
+    // ※中小企業診断士 管理会計の基礎として必要。1級（62h+51h）は不要
+    start: 70, end: 91, name: "財務・会計④2級工業講義", subject: "財務・会計",
+    sub: "2026年6月下旬〜7月中旬・CPAラーニング 2級工業簿記（登川）全14講義", weeks: 3,
+    tasks: [
+      { title: "2級工業簿記（登川）を1コマ視聴（全14講義）", detail: "1コマ平均61分=ほぼ1時間フル視聴。原価計算・製造間接費・標準原価を習得", url: "https://www.cpa-learning.com/courses/510005", time: 61 }
+    ],
+    weekendTasks: [
+      { title: "2級工業 問題集解説＋ネット模擬試験で総仕上げ", detail: "問題集解説（14講義・9時間44分）→2級模試（7時間52分）を週末で消化", url: "https://www.cpa-learning.com/courses/360017", time: 120 }
     ]
   },
   {
