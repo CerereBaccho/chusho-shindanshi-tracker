@@ -366,9 +366,10 @@ const PHASES = [
     // CPAラーニング 日商簿記3級 全23講義 15時間51分（1講義平均41分）
     start: 0, end: 28, name: "財務・会計①3級講義", subject: "財務・会計",
     sub: "2026年4月下旬〜5月中旬・CPAラーニング 簿記3級 全23講義", weeks: 4,
+    practiceUrl: "https://www.cpa-learning.com/courses/330002",
     tasks: [
       { title: "3級講義を1コマ視聴（全23講義）", detail: "1コマ平均41分。第1講義から順に視聴し仕訳の基礎を固める", url: "https://www.cpa-learning.com/courses/90002", time: 41 },
-      { title: "視聴範囲の問題を5問演習", detail: "テキスト問題または問題集解説で該当論点を確認", time: 19 }
+      { title: "視聴範囲の問題を5問演習", detail: "CPAラーニング 3級問題集解説で当該論点を確認", time: 19 }
     ],
     weekendTasks: [
       { title: "3級ネット試験対策を消化（全15講義・7時間7分）", detail: "週に3〜4コマを目安。試験形式に慣れる", url: "https://www.cpa-learning.com/courses/420025", time: 120 }
@@ -378,9 +379,10 @@ const PHASES = [
     // CPAラーニング 日商簿記3級 問題集解説 全19講義 9時間57分 / ネット模擬試験 全3講義 6時間15分
     start: 28, end: 42, name: "財務・会計②3級仕上げ", subject: "財務・会計",
     sub: "2026年5月中旬〜下旬・問題集解説（19講義）＋ネット模擬試験", weeks: 2,
+    practiceUrl: "https://www.cpa-learning.com/courses/330002",
     tasks: [
       { title: "3級問題集解説を1〜2コマ視聴", detail: "全19講義・9時間57分。苦手論点を重点的に再確認", url: "https://www.cpa-learning.com/courses/330002", time: 40 },
-      { title: "間違えた論点の講義を再視聴", detail: "誤答した章を10〜15分でピンポイント確認", time: 20 }
+      { title: "間違えた論点の講義を再視聴", detail: "誤答した章を10〜15分でピンポイント確認", url: "https://www.cpa-learning.com/courses/90002", time: 20 }
     ],
     weekendTasks: [
       { title: "3級ネット模擬試験（全3本・6時間15分）を通しで解く", detail: "時間計測→採点→解説動画視聴の3ステップで定着", url: "https://www.cpa-learning.com/courses/630032", time: 120 }
@@ -390,9 +392,10 @@ const PHASES = [
     // CPAラーニング 日商簿記2級 商業簿記 全23講義 16時間53分（1講義平均44分）
     start: 42, end: 70, name: "財務・会計③2級商業講義", subject: "財務・会計",
     sub: "2026年5月下旬〜6月下旬・CPAラーニング 2級商業簿記 全23講義", weeks: 4,
+    practiceUrl: "https://www.cpa-learning.com/courses/360010",
     tasks: [
       { title: "2級商業簿記を1コマ視聴（全23講義）", detail: "1コマ平均44分。株式・税効果・連結会計など順に視聴", url: "https://www.cpa-learning.com/courses/30003", time: 44 },
-      { title: "視聴範囲の仕訳・計算問題を5問演習", detail: "商業簿記は仕訳の正確さが命。都度手を動かす", time: 16 }
+      { title: "視聴範囲の仕訳・計算問題を5問演習", detail: "CPAラーニング 2級商業問題集解説で当該論点を確認", time: 16 }
     ],
     weekendTasks: [
       { title: "2級商業 問題集解説を2〜3コマ視聴（全16講義・8時間4分）", detail: "週末に並行消化。解説動画で解法の型を習得", url: "https://www.cpa-learning.com/courses/360010", time: 120 }
@@ -403,6 +406,7 @@ const PHASES = [
     // ※中小企業診断士 管理会計の基礎として必要。1級（62h+51h）は不要
     start: 70, end: 91, name: "財務・会計④2級工業講義", subject: "財務・会計",
     sub: "2026年6月下旬〜7月中旬・CPAラーニング 2級工業簿記（登川）全14講義", weeks: 3,
+    practiceUrl: "https://www.cpa-learning.com/courses/360017",
     tasks: [
       { title: "2級工業簿記（登川）を1コマ視聴（全14講義）", detail: "1コマ平均61分=ほぼ1時間フル視聴。原価計算・製造間接費・標準原価を習得", url: "https://www.cpa-learning.com/courses/510005", time: 61 }
     ],
@@ -1001,7 +1005,9 @@ function render() {
     const done = state.done.includes(idx);
     const div = document.createElement('div');
     div.className = 'todo' + (done ? ' done' : '');
-    const link = t.url ? `<a class="todo-link" href="${t.url}" target="_blank" rel="noopener">リソースを開く ↗</a>` : '';
+    const taskUrl = t.url || phase.practiceUrl;
+    const linkLabel = t.url ? 'リソースを開く ↗' : '問題集を開く ↗';
+    const link = taskUrl ? `<a class="todo-link" href="${taskUrl}" target="_blank" rel="noopener">${linkLabel}</a>` : '';
     div.innerHTML = `
       <input type="checkbox" ${done ? 'checked' : ''} />
       <div class="todo-body">
@@ -1121,8 +1127,10 @@ function showPhaseDetail(idx) {
   const content = document.getElementById('phase-modal-content');
 
   function taskItemHtml(t, isWeekend) {
-    const link = t.url
-      ? `<a class="todo-link" href="${escHtml(t.url)}" target="_blank" rel="noopener">リソースを開く ↗</a>`
+    const taskUrl = t.url || phase.practiceUrl;
+    const linkLabel = t.url ? 'リソースを開く ↗' : '問題集を開く ↗';
+    const link = taskUrl
+      ? `<a class="todo-link" href="${escHtml(taskUrl)}" target="_blank" rel="noopener">${linkLabel}</a>`
       : '';
     return `
       <div class="phase-task-item${isWeekend ? ' weekend' : ''}">
@@ -1142,6 +1150,10 @@ function showPhaseDetail(idx) {
       uniqueResources.push({ title: t.title, url: t.url });
     }
   });
+  if (phase.practiceUrl && !seen.has(phase.practiceUrl)) {
+    seen.add(phase.practiceUrl);
+    uniqueResources.push({ title: '問題集', url: phase.practiceUrl });
+  }
 
   content.innerHTML = `
     <div style="padding-right:2rem;margin-bottom:1.25rem">
