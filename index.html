@@ -605,6 +605,37 @@ function saveDayState(d, state) {
   store.set('day:' + dateKey(d), JSON.stringify(state));
 }
 
+function computeOverallProgress() {
+  let totalTasks = 0;
+  for (const p of PHASES) {
+    totalTasks += p.tasks.length * (p.end - p.start);
+  }
+  let completedTasks = 0;
+  for (const k of store.keys('day:')) {
+    try {
+      const s = JSON.parse(store.get(k));
+      completedTasks += (s.done || []).length;
+    } catch {}
+  }
+  return { completedTasks, totalTasks };
+}
+
+function computePhaseProgress(phase, startStr) {
+  const totalTasks = phase.tasks.length * (phase.end - phase.start);
+  let completedTasks = 0;
+  const origin = new Date(startStr);
+  origin.setHours(0, 0, 0, 0);
+  for (let d = phase.start; d < phase.end; d++) {
+    const date = new Date(origin);
+    date.setDate(origin.getDate() + d);
+    try {
+      const raw = store.get('day:' + dateKey(date));
+      if (raw) completedTasks += (JSON.parse(raw).done || []).length;
+    } catch {}
+  }
+  return { completedTasks, totalTasks };
+}
+
 function computeTotals() {
   let totalMin = 0, streak = 0;
   for (const k of store.keys('day:')) {
@@ -946,10 +977,11 @@ function render() {
   const dayInPhase = dayIdx - phase.start + 1;
   const totalDays = phase.end - phase.start;
   document.getElementById('phase-sub').textContent = `${phase.sub} ・ ${dayInPhase}/${totalDays}日目`;
-  const pct = Math.round(dayInPhase / totalDays * 100);
+  const { completedTasks, totalTasks } = computePhaseProgress(phase, startStr);
+  const pct = totalTasks > 0 ? Math.round(completedTasks / totalTasks * 100) : 0;
   document.getElementById('phase-progress').style.display = 'block';
   document.getElementById('phase-bar').style.width = pct + '%';
-  document.getElementById('phase-pct').textContent = `フェーズ進捗: ${pct}%`;
+  document.getElementById('phase-pct').textContent = `フェーズ進捗: ${pct}% (${completedTasks} / ${totalTasks} タスク完了)`;
 
   // Weekend tasks (F-12)
   const ws = document.getElementById('weekend-section');
@@ -1025,8 +1057,8 @@ function renderRoadmap() {
   today.setHours(0, 0, 0, 0);
   const currentDayIdx = Math.floor((today - startDate) / 86400000);
 
-  const totalDays = PHASES[PHASES.length - 1].end;
-  const overallPct = Math.min(100, Math.max(0, Math.round(currentDayIdx / totalDays * 100)));
+  const { completedTasks: overallDone, totalTasks: overallTotal } = computeOverallProgress();
+  const overallPct = overallTotal > 0 ? Math.round(overallDone / overallTotal * 100) : 0;
 
   function phaseDate(offset) {
     const d = new Date(startDate);
@@ -1041,28 +1073,29 @@ function renderRoadmap() {
     <div class="roadmap-header">
       <div class="roadmap-overall-label">全体進捗</div>
       <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${overallPct}%"></div></div>
-      <div class="progress-pct">${overallPct}%　(${Math.max(0, currentDayIdx)}日目 / 全${totalDays}日)</div>
+      <div class="progress-pct">${overallPct}% (${overallDone} / ${overallTotal} タスク完了)</div>
     </div>
     <div class="rm-list">
   `;
 
   PHASES.forEach((phase, i) => {
-    let statusLabel, statusClass, phasePct;
+    let statusLabel, statusClass;
     if (currentDayIdx >= phase.end) {
-      statusLabel = '完了'; statusClass = 'rm-done'; phasePct = 100;
+      statusLabel = '完了'; statusClass = 'rm-done';
     } else if (currentDayIdx >= phase.start) {
       statusLabel = '進行中'; statusClass = 'rm-current';
-      phasePct = Math.round((currentDayIdx - phase.start) / (phase.end - phase.start) * 100);
     } else {
-      statusLabel = '未着手'; statusClass = 'rm-todo'; phasePct = 0;
+      statusLabel = '未着手'; statusClass = 'rm-todo';
     }
+    const { completedTasks: pDone, totalTasks: pTotal } = computePhaseProgress(phase, startStr);
+    const phasePct = pTotal > 0 ? Math.round(pDone / pTotal * 100) : 0;
 
     const dateRange = `${fmtYM(phaseDate(phase.start))} 〜 ${fmtYM(phaseDate(phase.end - 1))}`;
     const progressBar = statusClass !== 'rm-todo' ? `
       <div class="progress-bar-bg">
         <div class="progress-bar-fill ${statusClass === 'rm-done' ? 'rm-done' : ''}" style="width:${phasePct}%"></div>
       </div>
-      <div class="progress-pct">${phasePct}%</div>` : '';
+      <div class="progress-pct">${phasePct}% (${pDone} / ${pTotal} タスク完了)</div>` : '';
 
     html += `
       <div class="rm-card ${statusClass}" onclick="showPhaseDetail(${i})" role="button" tabindex="0" onkeydown="if(event.key==='Enter')showPhaseDetail(${i})">
