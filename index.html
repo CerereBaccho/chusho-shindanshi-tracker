@@ -682,14 +682,35 @@ function switchTab(tab) {
 function toggleTask(idx) {
   const state = loadDayState(viewDate);
   const i = state.done.indexOf(idx);
-  if (i >= 0) state.done.splice(i, 1); else state.done.push(idx);
+  const completing = i < 0;
+  if (completing) {
+    state.done.push(idx);
+  } else {
+    state.done.splice(i, 1);
+  }
+  // タスク完了/取り消しに連動して学習時間を自動加減算
+  const startStr = store.get('start-date');
+  if (startStr) {
+    const phase = getPhase(daysSince(startStr));
+    const task = phase && phase.tasks[idx];
+    if (task && task.time) {
+      state.minutes = Math.max(0, (state.minutes || 0) + (completing ? task.time : -task.time));
+    }
+  }
   saveDayState(viewDate, state);
   render();
 }
 
 function toggleManualTask(idx) {
   const state = loadDayState(viewDate);
-  if (state.manualTasks[idx]) state.manualTasks[idx].done = !state.manualTasks[idx].done;
+  const task = state.manualTasks[idx];
+  if (task) {
+    task.done = !task.done;
+    // タスク完了/取り消しに連動して学習時間を自動加減算
+    if (task.time) {
+      state.minutes = Math.max(0, (state.minutes || 0) + (task.done ? task.time : -task.time));
+    }
+  }
   saveDayState(viewDate, state);
   render();
 }
