@@ -103,6 +103,8 @@
     .todo-link:hover { text-decoration: underline; }
     .todo-del { font-size: 11px; color: var(--text2); background: none; border: none; cursor: pointer; font-family: inherit; padding: 0; }
     .todo-del:hover { color: #dc2626; }
+    .extra-lecture-btn { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--accent); color: #fff; border: none; cursor: pointer; }
+    .extra-lecture-btn:hover { opacity: 0.85; }
 
     /* Manual task form */
     .add-task-form { background: var(--bg2); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 1.25rem; }
@@ -619,6 +621,7 @@ function computeOverallProgress() {
     try {
       const s = JSON.parse(store.get(k));
       completedTasks += (s.done || []).length;
+      completedTasks += (s.manualTasks || []).filter(t => t.done).length;
     } catch {}
   }
   return { completedTasks, totalTasks };
@@ -634,7 +637,11 @@ function computePhaseProgress(phase, startStr) {
     date.setDate(origin.getDate() + d);
     try {
       const raw = store.get('day:' + dateKey(date));
-      if (raw) completedTasks += (JSON.parse(raw).done || []).length;
+      if (raw) {
+        const s = JSON.parse(raw);
+        completedTasks += (s.done || []).length;
+        completedTasks += (s.manualTasks || []).filter(t => t.done).length;
+      }
     } catch {}
   }
   return { completedTasks, totalTasks };
@@ -719,6 +726,13 @@ function deleteManualTask(idx) {
   if (!confirm('このタスクを削除しますか?')) return;
   const state = loadDayState(viewDate);
   state.manualTasks.splice(idx, 1);
+  saveDayState(viewDate, state);
+  render();
+}
+
+function addExtraLecture(task) {
+  const state = loadDayState(viewDate);
+  state.manualTasks.push({ title: task.title, time: task.time, detail: task.detail, url: task.url || '', done: false });
   saveDayState(viewDate, state);
   render();
 }
@@ -1029,14 +1043,18 @@ function render() {
     const taskUrl = t.url || phase.practiceUrl;
     const linkLabel = t.url ? 'リソースを開く ↗' : '問題集を開く ↗';
     const link = taskUrl ? `<a class="todo-link" href="${taskUrl}" target="_blank" rel="noopener">${linkLabel}</a>` : '';
+    const extraBtn = t.title.includes('講義') ? `<button class="extra-lecture-btn">＋もう1コマ</button>` : '';
     div.innerHTML = `
       <input type="checkbox" ${done ? 'checked' : ''} />
       <div class="todo-body">
         <p class="todo-title">${escHtml(t.title)}</p>
         <p class="todo-meta">${escHtml(t.detail)} ・ 目安 ${t.time}分</p>
-        <div class="todo-actions">${link}</div>
+        <div class="todo-actions">${link}${extraBtn}</div>
       </div>`;
     div.querySelector('input').addEventListener('change', () => toggleTask(idx));
+    if (t.title.includes('講義')) {
+      div.querySelector('.extra-lecture-btn').addEventListener('click', () => addExtraLecture(t));
+    }
     list.appendChild(div);
   });
 
