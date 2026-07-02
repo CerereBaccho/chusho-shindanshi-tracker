@@ -4,6 +4,15 @@
       "sentence-length": {
         "max": 100
       },
+      "max-kanji-continuous-len": {
+        "max": 6,
+        "allow": [
+          "中小企業診断士",
+          "中小企業診断士試験",
+          "中小企業診断協会",
+          "企業経営理論期"
+        ]
+      },
       "no-exclamation-question-mark": true,
       "no-doubled-joshi": true,
       "no-redundant-expression": true,
