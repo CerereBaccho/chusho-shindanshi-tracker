@@ -1,0 +1,26 @@
+{
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 100
+      },
+      "no-exclamation-question-mark": true,
+      "no-doubled-joshi": true,
+      "no-redundant-expression": true,
+      "ja-no-mixed-period": {
+        "periodMark": "。"
+      },
+      "no-unmatched-pair": true
+    },
+    "no-mix-dearu-desumasu": {
+      "preferInHeader": "",
+      "preferInBody": "ですます",
+      "preferInList": "ですます",
+      "strict": false
+    }
+  },
+  "filters": {
+    "comments": true
+  },
+  "plugins": []
+}

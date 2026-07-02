@@ -1,0 +1,124 @@
+# =============================================================
+# シークレット・認証情報
+# =============================================================
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+*.cer
+*.crt
+*.csr
+secrets/
+credentials/
+.credentials/
+*.secret
+*_secret.*
+*.token
+*_token.*
+
+# =============================================================
+# クラウド・Terraform
+# =============================================================
+.aws/
+.azure/
+.gcp/
+terraform.tfvars
+*.tfvars
+!example.tfvars
+*.tfvars.json
+*.auto.tfvars
+
+# Terraform 実行生成物
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+*.tfstate
+*.tfstate.*
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+crash.log
+crash.*.log
+
+# =============================================================
+# Node.js
+# =============================================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.pnpm-debug.log*
+.yarn/
+
+# =============================================================
+# Python
+# =============================================================
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# =============================================================
+# OS 生成物
+# =============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# =============================================================
+# Claude Code のローカル生成物
+# =============================================================
+.claude/worktrees/
+.claude/settings.local.json
+
+# =============================================================
+# エディタ
+# =============================================================
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+*.orig
+
+# =============================================================
+# 試験問題の著作物 (個人利用限定・再配布/公開禁止)
+# 中小企業診断協会の過去問PDF・変換後の問題JSONはコミットしない
+# =============================================================
+data/pdf/
+data/tmp_pages/
+data/questions/*.json
+!data/questions/schema.example.json
+
+# =============================================================
+# ログ・一時ファイル
+# =============================================================
+*.log
+logs/
+tmp/
+temp/
+.tmp/
+*.tmp
+*.temp
+*.bak
+*.cache
+.cache/
