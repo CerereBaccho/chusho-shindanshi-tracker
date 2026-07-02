@@ -1,0 +1,78 @@
+{
+  "$schema": "https://raw.githubusercontent.com/anthropics/claude-code/main/schemas/settings.schema.json",
+
+  "permissions": {
+    "allow": [
+      "Read(./**)",
+
+      "Bash(git status)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git checkout *)",
+      "Bash(git branch *)",
+      "Bash(git stash *)",
+      "Bash(git pull *)",
+      "Bash(git fetch *)",
+      "Bash(git rev-parse *)",
+
+      "Bash(npx textlint *)",
+      "Bash(npx markdownlint *)",
+      "Bash(npm run lint)",
+      "Bash(npm run test)",
+      "Bash(npm run build)",
+
+      "Bash(pwsh -Command Invoke-ScriptAnalyzer *)",
+
+      "Bash(terraform init)",
+      "Bash(terraform plan *)",
+      "Bash(terraform validate)",
+      "Bash(terraform fmt *)",
+
+      "Bash(cd *)",
+      "Bash(ls)",
+      "Bash(ls *)",
+      "Bash(ls*)",
+      "Bash(cat *)",
+      "Bash(Get-Content *)",
+      "Bash(Select-String *)",
+      "Bash(Test-Path *)"
+    ],
+
+    "ask": [
+      "Bash(git push *)",
+      "Bash(git merge *)",
+      "Bash(git rebase *)",
+      "Bash(gh pr *)",
+      "Bash(terraform apply *)",
+      "Bash(npm install *)",
+      "Bash(npm uninstall *)",
+      "Write(**)"
+    ],
+
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(Remove-Item -Recurse *)",
+      "Bash(Remove-Item * -Force *)",
+      "Bash(del /s *)",
+      "Bash(git push -f *)",
+      "Bash(git push --force *)",
+      "Bash(git reset --hard *)",
+      "Bash(git clean -fd *)",
+      "Bash(terraform destroy *)",
+      "Bash(* DROP *)",
+      "Bash(* TRUNCATE *)",
+      "Bash(reg add *)",
+      "Bash(reg delete *)",
+      "Bash(Set-ItemProperty -Path HKLM* *)",
+      "Bash(Set-ItemProperty -Path HKCU* *)"
+    ]
+  },
+
+  "notes": {
+    "_textlintrc": ".textlintrc.json が存在しない場合は project-template/.textlintrc.json を複製してください。",
+    "_terraform": "terraform 系コマンドは該当プロジェクトのみ有効化してください（不要なプロジェクトでは ask に移動）。",
+    "_mcp": "Notion / Google Drive への書き込みは、このプロジェクトの CLAUDE.md に明記してから使用してください。デフォルトは読み取り専用です。"
+  }
+}

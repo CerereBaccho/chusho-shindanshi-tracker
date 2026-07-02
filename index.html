@@ -17,6 +17,8 @@
       --accent-text: #1d4ed8;
       --success: #16a34a;
       --success-light: #dcfce7;
+      --danger: #dc2626;
+      --danger-light: #fef2f2;
       --border: #e4e4e7;
       --radius: 10px;
       --shadow: 0 1px 3px rgba(0,0,0,0.08);
@@ -33,6 +35,8 @@
         --accent-text: #93c5fd;
         --success: #22c55e;
         --success-light: #052e16;
+        --danger: #f87171;
+        --danger-light: #450a0a;
         --border: #27272a;
       }
     }
@@ -134,8 +138,47 @@
     button:hover { background: var(--bg2); }
     button.primary { background: var(--accent); color: white; border-color: var(--accent); }
     button.primary:hover { opacity: 0.9; background: var(--accent); }
-    button.danger { color: #dc2626; border-color: #dc2626; }
-    button.danger:hover { background: #fef2f2; }
+    button.danger { color: var(--danger); border-color: var(--danger); }
+    button.danger:hover { background: var(--danger-light); }
+
+    /* Quiz (演習) */
+    select {
+      padding: 6px 10px; font-size: 13px; border: 1px solid var(--border); border-radius: 7px;
+      background: var(--bg); color: var(--text); font-family: inherit; width: 100%;
+    }
+    .quiz-progress { font-size: 12px; color: var(--text2); margin-bottom: 8px; }
+    .quiz-card { background: var(--bg2); border-radius: var(--radius); padding: 1rem 1.25rem; margin-bottom: 1rem; }
+    .quiz-q { font-size: 14px; line-height: 1.7; white-space: pre-wrap; margin-bottom: 1rem; }
+    .quiz-choices { display: flex; flex-direction: column; gap: 8px; }
+    .choice-btn {
+      text-align: left; white-space: pre-wrap; padding: 10px 12px; border: 1px solid var(--border);
+      border-radius: 8px; background: var(--bg); color: var(--text); cursor: pointer;
+      font-family: inherit; font-size: 13px; line-height: 1.6; width: 100%; display: flex; gap: 8px;
+    }
+    .choice-btn:hover:not(:disabled) { background: var(--bg2); }
+    .choice-btn:disabled { cursor: default; }
+    .choice-btn.correct { background: var(--success-light); border-color: var(--success); color: var(--success); }
+    .choice-btn.wrong { background: var(--danger-light); border-color: var(--danger); color: var(--danger); }
+    .choice-key { font-weight: 600; flex-shrink: 0; }
+    .quiz-explain { margin-top: 1rem; padding: 10px 12px; border-radius: var(--radius); background: var(--accent-light); color: var(--accent-text); font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
+    .quiz-answer { margin-top: 1rem; padding: 12px; border-radius: var(--radius); background: var(--success-light); color: var(--text); font-size: 13px; line-height: 1.7; white-space: pre-wrap; }
+    .quiz-answer .answer-items { margin: 6px 0 0 1.2em; padding: 0; }
+    .quiz-answer .answer-items li { margin-bottom: 3px; }
+    .quiz-verdict { font-weight: 600; margin-bottom: 1rem; }
+    .quiz-verdict.ok { color: var(--success); }
+    .quiz-verdict.ng { color: var(--danger); }
+    .quiz-actions { display: flex; gap: 8px; margin-top: 1rem; }
+    .quiz-result { text-align: center; padding: 2rem 1rem; }
+    .quiz-result .score { font-size: 32px; font-weight: 600; margin-bottom: 4px; }
+    .quiz-result .score-sub { font-size: 13px; color: var(--text2); margin-bottom: 1.25rem; }
+    .bank-item { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .bank-item:last-child { border-bottom: none; }
+    .bank-meta { min-width: 0; }
+    .bank-name { font-weight: 500; }
+    .bank-sub { font-size: 11px; color: var(--text2); }
+    .review-banner { background: var(--accent-light); border-radius: var(--radius); padding: 10px 14px; font-size: 12px; color: var(--accent-text); margin-bottom: 1rem; line-height: 1.6; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .review-banner strong { font-size: 13px; }
+    .review-banner button { flex-shrink: 0; }
 
     /* Charts */
     .chart-section { margin-bottom: 1.5rem; }
@@ -218,6 +261,7 @@
 
   <div class="tabs">
     <button class="tab active" onclick="switchTab('home')">ホーム</button>
+    <button class="tab" onclick="switchTab('quiz')">演習</button>
     <button class="tab" onclick="switchTab('analysis')">分析</button>
     <button class="tab" onclick="switchTab('roadmap')">ロードマップ</button>
     <button class="tab" onclick="switchTab('settings')">設定</button>
@@ -258,6 +302,7 @@
     </div>
 
     <div class="tips" id="tip"></div>
+    <div id="review-section"></div>
     <div id="weekend-section"></div>
 
     <div class="section-label">本日のタスク</div>
@@ -290,8 +335,45 @@
     </div>
   </div>
 
+  <!-- ======== QUIZ (演習) ======== -->
+  <div class="page" id="page-quiz">
+    <div id="quiz-setup">
+      <div class="section-label">演習する範囲</div>
+      <div class="add-task-form">
+        <div class="form-row">
+          <select id="quiz-subject"></select>
+        </div>
+        <div class="form-row">
+          <select id="quiz-mode">
+            <option value="random">ランダム出題</option>
+            <option value="review">復習（期限が来た問題・誤答優先）</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label style="font-size:13px;color:var(--text2);align-self:center;white-space:nowrap">出題数</label>
+          <input type="number" id="quiz-count" min="1" max="100" value="10" style="width:80px" />
+          <button class="primary" onclick="startQuiz()" style="flex-shrink:0">出題開始</button>
+        </div>
+      </div>
+      <div id="quiz-empty" class="empty" style="display:none">
+        問題データがありません。「設定」タブの「問題データの読み込み」からJSONを取り込んでください。
+      </div>
+    </div>
+
+    <div id="quiz-active" style="display:none">
+      <div class="quiz-progress" id="quiz-progress"></div>
+      <div class="quiz-card" id="quiz-card"></div>
+    </div>
+
+    <div id="quiz-result" class="quiz-result" style="display:none"></div>
+  </div>
+
   <!-- ======== ANALYSIS ======== -->
   <div class="page" id="page-analysis">
+    <div class="chart-section">
+      <div class="chart-title">演習の成績</div>
+      <div id="quiz-stats"></div>
+    </div>
     <div class="chart-section">
       <div class="chart-title">科目別学習時間</div>
       <div class="bar-chart" id="subject-chart"></div>
@@ -332,6 +414,15 @@
         <button onclick="testNotification()">テスト</button>
       </div>
       <div class="settings-desc" id="notif-status">通知の許可が必要です</div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">問題データの読み込み</div>
+      <div class="settings-row">
+        <input type="file" id="quiz-import" accept="application/json,.json" onchange="importQuestions(this)" />
+      </div>
+      <div class="settings-desc">過去問のJSON（schema準拠）を読み込みます。データは端末内（localStorage）にのみ保存され、外部送信されません。著作権上、読み込んだ問題は個人学習用に限ります。</div>
+      <div id="bank-list" style="margin-top:10px"></div>
     </div>
 
     <div class="settings-section">
@@ -675,12 +766,14 @@ function goToday() { viewDate = new Date(); viewDate.setHours(0, 0, 0, 0); rende
 
 function switchTab(tab) {
   currentTab = tab;
-  const tabs = ['home', 'analysis', 'roadmap', 'settings'];
+  const tabs = ['home', 'quiz', 'analysis', 'roadmap', 'settings'];
   document.querySelectorAll('.tab').forEach((el, i) => el.classList.toggle('active', tabs[i] === tab));
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.getElementById('page-' + tab).classList.add('active');
   if (tab === 'analysis') renderAnalysis();
+  if (tab === 'quiz') renderQuizSetup();
   if (tab === 'roadmap') renderRoadmap();
+  if (tab === 'settings') renderBankList();
 }
 
 // ============================================================
@@ -861,12 +954,424 @@ function setupNotifTimer() {
 }
 
 // ============================================================
+// QUIZ (演習)
+// 問題データは設定タブから読み込み、localStorage の qbank:{id} に保存する。
+// 著作権の都合で問題本文は本体に埋め込まず、端末内にのみ保持する。
+// ============================================================
+const CHOICE_LABEL = { a: 'ア', b: 'イ', c: 'ウ', d: 'エ', e: 'オ' };
+let quizState = null;
+
+// ------------------------------------------------------------
+// SRS（Leitnerボックス間隔反復）
+// 各問の状態を srs:{questionId} に保存。box 1〜5 で再出題間隔を管理する。
+// ------------------------------------------------------------
+const SRS_INTERVALS = { 1: 1, 2: 3, 3: 7, 4: 14, 5: 30 };
+
+function todayKey() {
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  return dateKey(d);
+}
+
+function addDaysKey(days) {
+  const d = new Date(); d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + days);
+  return dateKey(d);
+}
+
+function loadSrs(id) {
+  const raw = store.get('srs:' + id);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+// 解答結果に応じて箱を更新。正解で箱を1つ上げ（最大5）、誤答で箱1へ戻す。
+function updateSrs(id, correct) {
+  const rec = loadSrs(id) || { box: 1, due: null, correct: 0, wrong: 0, lastAnswered: null };
+  if (correct) {
+    rec.box = Math.min(5, (rec.box || 1) + 1);
+    rec.correct = (rec.correct || 0) + 1;
+  } else {
+    rec.box = 1;
+    rec.wrong = (rec.wrong || 0) + 1;
+  }
+  rec.due = addDaysKey(SRS_INTERVALS[rec.box]);
+  rec.lastAnswered = todayKey();
+  store.set('srs:' + id, JSON.stringify(rec));
+}
+
+// 復習期限（due）が本日以前の問題数を数える（未解答の問題は対象外）
+function countDueReviews() {
+  const tkey = todayKey();
+  let n = 0;
+  getBanks().forEach(b => b.questions.forEach(q => {
+    const rec = loadSrs(q.id);
+    if (rec && rec.due && rec.due <= tkey) n++;
+  }));
+  return n;
+}
+
+function getBanks() {
+  return store.keys('qbank:').map(k => {
+    try {
+      const d = JSON.parse(store.get(k));
+      return { key: k, id: k.slice('qbank:'.length), meta: d.meta || {}, questions: Array.isArray(d.questions) ? d.questions : [] };
+    } catch { return null; }
+  }).filter(b => b && b.questions.length > 0);
+}
+
+function importQuestions(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data || !Array.isArray(data.questions) || data.questions.length === 0) {
+        throw new Error('questions 配列が見つかりません');
+      }
+      const meta = data.meta || {};
+      const id = `${meta.subject || '未分類'}-${meta.year || 'na'}`;
+      store.set('qbank:' + id, JSON.stringify({ meta, questions: data.questions }));
+      renderBankList();
+      alert(`読み込みました: ${meta.subject || '未分類'} (${data.questions.length}問)`);
+    } catch (err) {
+      alert('読み込みに失敗しました: ' + err.message);
+    }
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function deleteBank(key) {
+  if (!confirm('この問題データを削除しますか?')) return;
+  store.remove(key);
+  renderBankList();
+}
+
+function renderBankList() {
+  const el = document.getElementById('bank-list');
+  if (!el) return;
+  const banks = getBanks();
+  if (banks.length === 0) {
+    el.innerHTML = '<div class="settings-desc">読み込み済みの問題データはありません。</div>';
+    return;
+  }
+  el.innerHTML = '';
+  banks.forEach(b => {
+    const row = document.createElement('div');
+    row.className = 'bank-item';
+    const info = document.createElement('div');
+    info.className = 'bank-meta';
+    const name = document.createElement('div');
+    name.className = 'bank-name';
+    name.textContent = b.meta.subject || b.id;
+    const sub = document.createElement('div');
+    sub.className = 'bank-sub';
+    sub.textContent = `${b.meta.source || ''} ・ ${b.questions.length}問`;
+    info.appendChild(name);
+    info.appendChild(sub);
+    const del = document.createElement('button');
+    del.className = 'danger';
+    del.textContent = '削除';
+    del.addEventListener('click', () => deleteBank(b.key));
+    row.appendChild(info);
+    row.appendChild(del);
+    el.appendChild(row);
+  });
+}
+
+function renderQuizSetup() {
+  const banks = getBanks();
+  const setup = document.getElementById('quiz-setup');
+  const empty = document.getElementById('quiz-empty');
+  const sel = document.getElementById('quiz-subject');
+  document.getElementById('quiz-active').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+  setup.style.display = 'block';
+
+  if (banks.length === 0) {
+    empty.style.display = 'block';
+    sel.innerHTML = '';
+    return;
+  }
+  empty.style.display = 'none';
+  const subjects = [...new Set(banks.map(b => b.meta.subject || b.id))];
+  sel.innerHTML = '<option value="__all__">すべての科目</option>' +
+    subjects.map(s => `<option value="${escHtml(s)}">${escHtml(s)}</option>`).join('');
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function startQuiz() {
+  const subj = document.getElementById('quiz-subject').value;
+  const count = parseInt(document.getElementById('quiz-count').value, 10) || 10;
+  const mode = document.getElementById('quiz-mode').value;
+  const tkey = todayKey();
+  let pool = [];
+  getBanks().forEach(b => {
+    if (subj === '__all__' || (b.meta.subject || b.id) === subj) {
+      b.questions.forEach(q => {
+        const rec = loadSrs(q.id);
+        if (mode === 'review') {
+          if (rec && rec.due && rec.due <= tkey) pool.push({ q, rec });
+        } else {
+          pool.push({ q, rec });
+        }
+      });
+    }
+  });
+  if (pool.length === 0) {
+    alert(mode === 'review' ? '復習期限が来た問題はありません。' : '出題できる問題がありません。');
+    return;
+  }
+  if (mode === 'review') {
+    // 誤答優先: 箱が小さい（=直近で誤答/定着が浅い）順、次に期限が古い順
+    pool.sort((a, b) => (a.rec.box - b.rec.box) || (a.rec.due < b.rec.due ? -1 : 1));
+    pool = pool.slice(0, count);
+  } else {
+    shuffle(pool);
+    pool = pool.slice(0, count);
+  }
+  quizState = { pool: pool.map(x => x.q), idx: 0, correct: 0, answered: false, mode };
+  document.getElementById('quiz-setup').style.display = 'none';
+  document.getElementById('quiz-result').style.display = 'none';
+  document.getElementById('quiz-active').style.display = 'block';
+  renderQuizQuestion();
+}
+
+// ホームの「今日の復習」から復習モードで即開始する
+function startReview() {
+  switchTab('quiz');
+  document.getElementById('quiz-mode').value = 'review';
+  document.getElementById('quiz-subject').value = '__all__';
+  startQuiz();
+}
+
+function renderQuizQuestion() {
+  const q = quizState.pool[quizState.idx];
+  quizState.answered = false;
+  document.getElementById('quiz-progress').textContent =
+    `第${quizState.idx + 1}問 / 全${quizState.pool.length}問 ・ 正解 ${quizState.correct}`;
+
+  const card = document.getElementById('quiz-card');
+  card.innerHTML = '';
+
+  const qText = document.createElement('div');
+  qText.className = 'quiz-q';
+  let txt = q.text || '';
+  if (Array.isArray(q.subQuestions) && q.subQuestions.length) {
+    txt += '\n' + q.subQuestions.map(sq => `${sq.no || ''} ${sq.text || ''}`.trim()).join('\n');
+  }
+  qText.textContent = txt;
+  card.appendChild(qText);
+
+  if (q.choices && Object.keys(q.choices).length) {
+    // 4〜5択の選択問題
+    const choices = document.createElement('div');
+    choices.className = 'quiz-choices';
+    Object.keys(q.choices).forEach(key => {
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.dataset.key = key;
+      const label = document.createElement('span');
+      label.className = 'choice-key';
+      label.textContent = (CHOICE_LABEL[key] || key) + '.';
+      const body = document.createElement('span');
+      body.textContent = q.choices[key];
+      btn.appendChild(label);
+      btn.appendChild(body);
+      btn.addEventListener('click', () => answerQuiz(key));
+      choices.appendChild(btn);
+    });
+    card.appendChild(choices);
+  } else {
+    // 穴埋め等のフラッシュカード（簿記など選択肢を持たない問題）
+    const actions = document.createElement('div');
+    actions.className = 'quiz-actions';
+    const reveal = document.createElement('button');
+    reveal.className = 'primary';
+    reveal.textContent = '答えを表示';
+    reveal.addEventListener('click', () => {
+      actions.remove();
+      card.appendChild(renderFlashcardAnswer(q));
+      const grade = document.createElement('div');
+      grade.className = 'quiz-actions';
+      const ok = document.createElement('button');
+      ok.className = 'primary';
+      ok.textContent = 'できた';
+      ok.addEventListener('click', () => gradeFlashcard(true));
+      const ng = document.createElement('button');
+      ng.className = 'danger';
+      ng.textContent = 'できなかった';
+      ng.addEventListener('click', () => gradeFlashcard(false));
+      grade.appendChild(ok);
+      grade.appendChild(ng);
+      card.appendChild(grade);
+    });
+    actions.appendChild(reveal);
+    card.appendChild(actions);
+  }
+}
+
+// フラッシュカードの解答を整形して表示する
+function renderFlashcardAnswer(q) {
+  const box = document.createElement('div');
+  box.className = 'quiz-answer';
+  const ans = q.answer;
+  if (ans == null) { box.textContent = '（解答データがありません）'; return box; }
+  if (typeof ans === 'string' || typeof ans === 'number') { box.textContent = String(ans); return box; }
+  if (ans.description) {
+    const d = document.createElement('div');
+    d.textContent = ans.description;
+    box.appendChild(d);
+  }
+  if (Array.isArray(ans.items) && ans.items.length) {
+    const ul = document.createElement('ul');
+    ul.className = 'answer-items';
+    ans.items.forEach(it => {
+      const li = document.createElement('li');
+      li.textContent = formatAnswerItem(it);
+      ul.appendChild(li);
+    });
+    box.appendChild(ul);
+  }
+  if (!ans.description && !(Array.isArray(ans.items) && ans.items.length)) {
+    box.textContent = JSON.stringify(ans);
+  }
+  return box;
+}
+
+function formatAnswerItem(it) {
+  if (it == null) return '';
+  if (typeof it === 'string' || typeof it === 'number') return String(it);
+  if (it.no != null && it.value != null) return `${it.no}: ${it.value}`;
+  if (it.category != null && Array.isArray(it.items)) return `${it.category}: ${it.items.join('、')}`;
+  return JSON.stringify(it);
+}
+
+// 選択問題・フラッシュカード共通の「採点後UI」（正誤表示＋次へ）
+function finishAnswer(card, q, correct, wrongAnswerLabel) {
+  const verdict = document.createElement('div');
+  verdict.className = 'quiz-verdict ' + (correct ? 'ok' : 'ng');
+  verdict.textContent = correct
+    ? '正解'
+    : (wrongAnswerLabel ? `不正解（正解: ${wrongAnswerLabel}）` : '不正解');
+  card.appendChild(verdict);
+
+  if (q.explanation) {
+    const exp = document.createElement('div');
+    exp.className = 'quiz-explain';
+    exp.textContent = q.explanation;
+    card.appendChild(exp);
+  }
+
+  const actions = document.createElement('div');
+  actions.className = 'quiz-actions';
+  const next = document.createElement('button');
+  next.className = 'primary';
+  next.textContent = quizState.idx >= quizState.pool.length - 1 ? '結果を見る' : '次の問題 ▶';
+  next.addEventListener('click', nextQuiz);
+  actions.appendChild(next);
+  card.appendChild(actions);
+}
+
+// フラッシュカードの自己採点（できた=正解として SRS に記録）
+function gradeFlashcard(correct) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.pool[quizState.idx];
+  if (correct) quizState.correct++;
+  if (q.id) updateSrs(q.id, correct);
+  const card = document.getElementById('quiz-card');
+  const actionsList = card.querySelectorAll('.quiz-actions');
+  if (actionsList.length) actionsList[actionsList.length - 1].remove();
+  finishAnswer(card, q, correct, null);
+}
+
+function answerQuiz(key) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+  const q = quizState.pool[quizState.idx];
+  const correct = key === q.answer;
+  if (correct) quizState.correct++;
+  if (q.id) updateSrs(q.id, correct);
+
+  const card = document.getElementById('quiz-card');
+  card.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true;
+    const k = btn.dataset.key;
+    if (k === q.answer) btn.classList.add('correct');
+    else if (k === key) btn.classList.add('wrong');
+  });
+
+  finishAnswer(card, q, correct, correct ? null : (CHOICE_LABEL[q.answer] || q.answer));
+}
+
+function nextQuiz() {
+  if (quizState.idx >= quizState.pool.length - 1) { finishQuiz(); return; }
+  quizState.idx++;
+  renderQuizQuestion();
+}
+
+function finishQuiz() {
+  document.getElementById('quiz-active').style.display = 'none';
+  const total = quizState.pool.length;
+  const correct = quizState.correct;
+  const pct = Math.round(correct / total * 100);
+  const el = document.getElementById('quiz-result');
+  el.style.display = 'block';
+  el.innerHTML = `
+    <div class="score">${correct} / ${total}</div>
+    <div class="score-sub">正答率 ${pct}%</div>`;
+  const again = document.createElement('button');
+  again.className = 'primary';
+  again.textContent = 'もう一度演習する';
+  again.addEventListener('click', renderQuizSetup);
+  el.appendChild(again);
+}
+
+// ============================================================
 // ANALYSIS
 // ============================================================
 function renderAnalysis() {
+  renderQuizStats();
   renderSubjectChart();
   renderWeeklySummary();
   renderMonthlySummary();
+}
+
+// 演習の成績（SRSの累計正答/誤答から科目別に集計）
+function renderQuizStats() {
+  const el = document.getElementById('quiz-stats');
+  const banks = getBanks();
+  if (banks.length === 0) {
+    el.innerHTML = '<div class="empty">演習データがありません。「設定」タブから問題を読み込んでください。</div>';
+    return;
+  }
+  const tkey = todayKey();
+  let html = '<table class="summary-table"><thead><tr><th>科目</th><th>学習済</th><th>累計正答率</th><th>復習待ち</th></tr></thead><tbody>';
+  banks.forEach(b => {
+    let studied = 0, correct = 0, wrong = 0, due = 0;
+    b.questions.forEach(q => {
+      const r = loadSrs(q.id);
+      if (r) {
+        studied++;
+        correct += r.correct || 0;
+        wrong += r.wrong || 0;
+        if (r.due && r.due <= tkey) due++;
+      }
+    });
+    const answered = correct + wrong;
+    const rate = answered > 0 ? Math.round(correct / answered * 100) + '%' : '—';
+    html += `<tr><td>${escHtml(b.meta.subject || b.id)}</td><td>${studied}/${b.questions.length}</td><td>${rate}</td><td>${due}問</td></tr>`;
+  });
+  el.innerHTML = html + '</tbody></table>';
 }
 
 function getSubjectMinutes() {
@@ -979,6 +1484,15 @@ function render() {
   document.getElementById('total-hours').textContent = hours.toFixed(1) + 'h';
   document.getElementById('streak').textContent = totals.streak + '日';
   document.getElementById('remaining').textContent = Math.max(0, Math.round(1000 - hours)) + 'h';
+
+  // 今日の復習（SRSで期限が来た問題）をホームに差し込む
+  const reviewEl = document.getElementById('review-section');
+  const dueCount = countDueReviews();
+  if (dueCount > 0) {
+    reviewEl.innerHTML = `<div class="review-banner"><span><strong>今日の復習: ${dueCount}問</strong>期限が来た問題を演習で復習しましょう</span><button class="primary" onclick="startReview()">復習する</button></div>`;
+  } else {
+    reviewEl.innerHTML = '';
+  }
 
   const startStr = store.get('start-date');
   const list = document.getElementById('todo-list');
