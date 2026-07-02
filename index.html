@@ -109,6 +109,10 @@
     .todo-del:hover { color: #dc2626; }
     .extra-lecture-btn { font-size: 11px; padding: 2px 8px; border-radius: 4px; background: var(--accent); color: #fff; border: none; cursor: pointer; }
     .extra-lecture-btn:hover { opacity: 0.85; }
+    .todo-lecture { color: var(--accent); }
+    .lecture-status { display: inline-flex; gap: 4px; align-items: center; font-size: 11px; color: var(--text2); }
+    .lecture-adj { width: 18px; height: 18px; line-height: 1; font-size: 11px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg2); color: var(--text2); cursor: pointer; padding: 0; }
+    .lecture-adj:hover { border-color: var(--accent); color: var(--accent); }
 
     /* Manual task form */
     .add-task-form { background: var(--bg2); border-radius: var(--radius); padding: 0.85rem 1rem; margin-bottom: 1.25rem; }
@@ -461,11 +465,11 @@ const PHASES = [
     sub: "2026年4月下旬〜5月中旬・CPAラーニング 簿記3級 全23講義", weeks: 4,
     practiceUrl: "https://www.cpa-learning.com/courses/330002",
     tasks: [
-      { title: "3級講義を1コマ視聴（全23講義）", detail: "1コマ平均41分。第1講義から順に視聴し仕訳の基礎を固める", url: "https://www.cpa-learning.com/courses/90002", time: 41 },
+      { title: "3級講義を1コマ視聴（全23講義）", detail: "1コマ平均41分。第1講義から順に視聴し仕訳の基礎を固める", url: "https://www.cpa-learning.com/courses/90002", course: "90002", time: 41 },
       { title: "視聴範囲の問題を5問演習", detail: "CPAラーニング 3級問題集解説で当該論点を確認", time: 19 }
     ],
     weekendTasks: [
-      { title: "3級ネット試験対策を消化（全15講義・7時間7分）", detail: "週に3〜4コマを目安。試験形式に慣れる", url: "https://www.cpa-learning.com/courses/420025", time: 120 }
+      { title: "3級ネット試験対策を消化（全15講義・7時間7分）", detail: "週に3〜4コマを目安。試験形式に慣れる", url: "https://www.cpa-learning.com/courses/420025", course: "420025", time: 120 }
     ]
   },
   {
@@ -474,11 +478,11 @@ const PHASES = [
     sub: "2026年5月中旬〜下旬・問題集解説（19講義）＋ネット模擬試験", weeks: 2,
     practiceUrl: "https://www.cpa-learning.com/courses/330002",
     tasks: [
-      { title: "3級問題集解説を1〜2コマ視聴", detail: "全19講義・9時間57分。苦手論点を重点的に再確認", url: "https://www.cpa-learning.com/courses/330002", time: 40 },
+      { title: "3級問題集解説を1〜2コマ視聴", detail: "全19講義・9時間57分。苦手論点を重点的に再確認", url: "https://www.cpa-learning.com/courses/330002", course: "330002", time: 40 },
       { title: "間違えた論点の講義を再視聴", detail: "誤答した章を10〜15分でピンポイント確認", url: "https://www.cpa-learning.com/courses/90002", time: 20 }
     ],
     weekendTasks: [
-      { title: "3級ネット模擬試験（全3本・6時間15分）を通しで解く", detail: "時間計測→採点→解説動画視聴の3ステップで定着", url: "https://www.cpa-learning.com/courses/630032", time: 120 }
+      { title: "3級ネット模擬試験（全3本・6時間15分）を通しで解く", detail: "時間計測→採点→解説動画視聴の3ステップで定着", url: "https://www.cpa-learning.com/courses/630032", course: "630032", time: 120 }
     ]
   },
   {
@@ -487,11 +491,11 @@ const PHASES = [
     sub: "2026年5月下旬〜6月下旬・CPAラーニング 2級商業簿記 全23講義", weeks: 4,
     practiceUrl: "https://www.cpa-learning.com/courses/360010",
     tasks: [
-      { title: "2級商業簿記を1コマ視聴（全23講義）", detail: "1コマ平均44分。株式・税効果・連結会計など順に視聴", url: "https://www.cpa-learning.com/courses/30003", time: 44 },
+      { title: "2級商業簿記を1コマ視聴（全23講義）", detail: "1コマ平均44分。株式・税効果・連結会計など順に視聴", url: "https://www.cpa-learning.com/courses/30003", course: "30003", time: 44 },
       { title: "視聴範囲の仕訳・計算問題を5問演習", detail: "CPAラーニング 2級商業問題集解説で当該論点を確認", time: 16 }
     ],
     weekendTasks: [
-      { title: "2級商業 問題集解説を2〜3コマ視聴（全16講義・8時間4分）", detail: "週末に並行消化。解説動画で解法の型を習得", url: "https://www.cpa-learning.com/courses/360010", time: 120 }
+      { title: "2級商業 問題集解説を2〜3コマ視聴（全16講義・8時間4分）", detail: "週末に並行消化。解説動画で解法の型を習得", url: "https://www.cpa-learning.com/courses/360010", course: "360010", time: 120 }
     ]
   },
   {
@@ -501,10 +505,10 @@ const PHASES = [
     sub: "2026年6月下旬〜7月中旬・CPAラーニング 2級工業簿記（登川）全14講義", weeks: 3,
     practiceUrl: "https://www.cpa-learning.com/courses/360017",
     tasks: [
-      { title: "2級工業簿記（登川）を1コマ視聴（全14講義）", detail: "1コマ平均61分=ほぼ1時間フル視聴。原価計算・製造間接費・標準原価を習得", url: "https://www.cpa-learning.com/courses/510005", time: 61 }
+      { title: "2級工業簿記（登川）を1コマ視聴（全14講義）", detail: "1コマ平均61分=ほぼ1時間フル視聴。原価計算・製造間接費・標準原価を習得", url: "https://www.cpa-learning.com/courses/510005", course: "510005", time: 61 }
     ],
     weekendTasks: [
-      { title: "2級工業 問題集解説＋ネット模擬試験で総仕上げ", detail: "問題集解説（14講義・9時間44分）→2級模試（7時間52分）を週末で消化", url: "https://www.cpa-learning.com/courses/360017", time: 120 }
+      { title: "2級工業 問題集解説＋ネット模擬試験で総仕上げ", detail: "問題集解説（14講義・9時間44分）→2級模試（7時間52分）を週末で消化", url: "https://www.cpa-learning.com/courses/360017", course: "360017", time: 120 }
     ]
   },
   {
@@ -627,6 +631,189 @@ const PHASES = [
   }
 ];
 
+// ============================================================
+// LECTURES（CPAラーニング各コースの個別講義URL）
+// 視聴進捗は localStorage の lecture:{courseId} に視聴済みコマ数で保存する
+// ============================================================
+const LECTURE_BASE = "https://www.cpa-learning.com/lessons/";
+const LECTURES = {
+  "90002": {
+    name: "日商簿記3級 講義",
+    courseUrl: "https://www.cpa-learning.com/courses/90002",
+    lessons: [
+      { id: 60002, t: "序章 簿記とは" },
+      { id: 60005, t: "第1章 財務諸表①（貸借対照表と損益計算書）" },
+      { id: 60006, t: "第1章 財務諸表②（貸借対照表と損益計算書）" },
+      { id: 90003, t: "第2章 簿記の全体像" },
+      { id: 60009, t: "第3章 基本的な取引と勘定科目" },
+      { id: 60012, t: "第4章 商品売買" },
+      { id: 60024, t: "第5章 現金預金" },
+      { id: 60025, t: "第6章 固定資産に関連した取引" },
+      { id: 60026, t: "第7章 資金の賃貸借" },
+      { id: 90007, t: "第8章 給料に関連した取引" },
+      { id: 90008, t: "第9章 その他の取引" },
+      { id: 60027, t: "第10章 帳簿と伝票" },
+      { id: 90009, t: "第11章 決算Ⅰ（全体像・決算振替仕訳）" },
+      { id: 60028, t: "第12章 決算Ⅱ①（総論・減価償却・貸倒引当金・売上原価・経過勘定）" },
+      { id: 120002, t: "第12章 決算Ⅱ②（総論・減価償却・貸倒引当金・売上原価・経過勘定）" },
+      { id: 120003, t: "第12章 決算Ⅱ③（総論・減価償却・貸倒引当金・売上原価・経過勘定）" },
+      { id: 120004, t: "第12章 決算Ⅱ④（総論・減価償却・貸倒引当金・売上原価・経過勘定）" },
+      { id: 150002, t: "第13章 決算Ⅲ（現金過不足・貯蔵品・当座借越）" },
+      { id: 120005, t: "第14章 決算Ⅳ（精算表・月次決算）" },
+      { id: 150003, t: "第15章 株式会社会計・税金" },
+      { id: 120006, t: "第16章 証ひょう" },
+      { id: 450002, t: "簿記3級合格までの流れ" },
+      { id: 450145, t: "簿記3級補講講義" }
+    ]
+  },
+  "330002": {
+    name: "日商簿記3級 問題集解説",
+    courseUrl: "https://www.cpa-learning.com/courses/330002",
+    lessons: [
+      { id: 420004, t: "第1章 財務諸表" },
+      { id: 420005, t: "第2章 簿記の全体像" },
+      { id: 420006, t: "第3章 基本的な取引と勘定科目" },
+      { id: 420007, t: "第4章 商品売買" },
+      { id: 390007, t: "第5章 現金預金" },
+      { id: 420008, t: "第6章 固定資産に関連した取引" },
+      { id: 420009, t: "第7章 資金の賃貸借" },
+      { id: 420010, t: "第8章 給料に関連した取引" },
+      { id: 420011, t: "第9章 その他の取引" },
+      { id: 390008, t: "第10章 帳簿と伝票（前半）" },
+      { id: 420012, t: "第10章 帳簿と伝票（後半）" },
+      { id: 390009, t: "第11章 決算Ⅰ（全体像・決算振替仕訳）" },
+      { id: 420013, t: "第12章 決算Ⅱ（総論・減価償却）" },
+      { id: 420014, t: "第12章 決算Ⅱ（貸倒引当金）" },
+      { id: 420015, t: "第12章 決算Ⅱ（売上原価）" },
+      { id: 420016, t: "第12章 決算Ⅱ（経過勘定）" },
+      { id: 420017, t: "第13章 決算Ⅲ（現金過不足・貯蔵品・当座借越）" },
+      { id: 420018, t: "第14章 決算Ⅳ（精算表・月次決算）" },
+      { id: 420019, t: "第15・16章 株式会社会計・税金 証ひょう" }
+    ]
+  },
+  "420025": {
+    name: "日商簿記3級 ネット試験対策",
+    courseUrl: "https://www.cpa-learning.com/courses/420025",
+    lessons: [
+      { id: 510196, t: "ガイダンス" },
+      { id: 510197, t: "試験概要" },
+      { id: 570017, t: "第1問のポイント" },
+      { id: 510198, t: "第1問の攻略法" },
+      { id: 570018, t: "第2問のポイント" },
+      { id: 510199, t: "第2問 勘定記入の攻略法" },
+      { id: 570019, t: "第2問 勘定記入（実践編①経過勘定）" },
+      { id: 570020, t: "第2問 勘定記入（実践編②法人税等）" },
+      { id: 570021, t: "第2問 補助簿（実践編③）" },
+      { id: 510200, t: "第3問のポイント" },
+      { id: 510201, t: "第3問 解答形式ごとの特徴" },
+      { id: 570022, t: "第3問 精算表（実践解説）" },
+      { id: 510202, t: "第3問 決算整理後残高試算表（実践解説）" },
+      { id: 570023, t: "第3問 財務二表（実践解説）" },
+      { id: 570024, t: "試験前の確認事項" }
+    ]
+  },
+  "630032": {
+    name: "日商簿記3級 ネット模擬試験 解説動画",
+    courseUrl: "https://www.cpa-learning.com/courses/630032",
+    lessons: [
+      { id: 690285, t: "ネット模擬試験 解説動画 第1回" },
+      { id: 690286, t: "ネット模擬試験 解説動画 第2回" },
+      { id: 720312, t: "ネット模擬試験 解説動画 第3回" }
+    ]
+  },
+  "30003": {
+    name: "日商簿記2級 商業簿記",
+    courseUrl: "https://www.cpa-learning.com/courses/30003",
+    lessons: [
+      { id: 30002, t: "第1章 商品" },
+      { id: 150014, t: "第2章 収益認識" },
+      { id: 120017, t: "第3章 現金預金" },
+      { id: 120029, t: "第4章 債権債務" },
+      { id: 150027, t: "第5章第1節 有価証券①" },
+      { id: 120030, t: "第5章第2〜3節 有価証券②" },
+      { id: 120031, t: "第6章第1〜2節 有形固定資産①" },
+      { id: 120032, t: "第6章第3節 有形固定資産②" },
+      { id: 120035, t: "第7章 無形資産" },
+      { id: 120036, t: "第8章 リース取引" },
+      { id: 120037, t: "第9章 引当金" },
+      { id: 120038, t: "第10章 株式会社会計" },
+      { id: 120041, t: "第11章 外貨建取引" },
+      { id: 120042, t: "第12章第1〜2節 税効果会計①" },
+      { id: 150029, t: "第12章第3節 税効果会計②" },
+      { id: 120045, t: "第13章第1〜2節 財務諸表①" },
+      { id: 150030, t: "第13章第3節 財務諸表②" },
+      { id: 150031, t: "第14章 本支店会計" },
+      { id: 120047, t: "第15章第1〜2節 連結会計①" },
+      { id: 120048, t: "第15章第3節 連結会計②" },
+      { id: 150032, t: "第15章第4〜6節 連結会計③" },
+      { id: 120049, t: "第16章 製造業会計" },
+      { id: 450146, t: "簿記2級補講講義" }
+    ]
+  },
+  "360010": {
+    name: "日商簿記2級 商業簿記 問題集解説",
+    courseUrl: "https://www.cpa-learning.com/courses/360010",
+    lessons: [
+      { id: 450050, t: "第1章 商品" },
+      { id: 450051, t: "第2章 収益認識" },
+      { id: 450052, t: "第3章 現金預金" },
+      { id: 450053, t: "第4章 債権債務" },
+      { id: 480066, t: "第5章 有価証券" },
+      { id: 450078, t: "第6章 有形固定資産" },
+      { id: 480067, t: "第7章 無形資産" },
+      { id: 480068, t: "第8章 リース取引" },
+      { id: 450079, t: "第9章 引当金" },
+      { id: 480069, t: "第10章 株式会社会計" },
+      { id: 450080, t: "第11章 外貨建取引" },
+      { id: 480070, t: "第12章 税効果会計" },
+      { id: 480076, t: "第13章 財務諸表" },
+      { id: 480077, t: "第14章 本支店会計" },
+      { id: 450086, t: "第15章 連結会計" },
+      { id: 480078, t: "第16章 製造業会計" }
+    ]
+  },
+  "510005": {
+    name: "日商簿記2級 工業簿記（登川）",
+    courseUrl: "https://www.cpa-learning.com/courses/510005",
+    lessons: [
+      { id: 600031, t: "第1章 工業簿記の基礎" },
+      { id: 600032, t: "第2章 材料費" },
+      { id: 630031, t: "第3章 労務費" },
+      { id: 600033, t: "第4章 経費" },
+      { id: 600034, t: "第5章 製造間接費" },
+      { id: 630032, t: "第6章 部門別計算" },
+      { id: 600035, t: "第7章 個別原価計算" },
+      { id: 630033, t: "第8章 総合原価計算" },
+      { id: 630034, t: "第9章 その他の総合原価計算" },
+      { id: 600036, t: "第10章 決算と財務諸表" },
+      { id: 600037, t: "第11章 標準原価計算" },
+      { id: 630035, t: "第12章 直接原価計算" },
+      { id: 600038, t: "第13章 CVP分析" },
+      { id: 630036, t: "第14章 本社工場会計" }
+    ]
+  },
+  "360017": {
+    name: "日商簿記2級 工業簿記 問題集解説",
+    courseUrl: "https://www.cpa-learning.com/courses/360017",
+    lessons: [
+      { id: 480109, t: "第1章 工業簿記の基礎" },
+      { id: 450105, t: "第2章 材料費" },
+      { id: 450106, t: "第3章 労務費" },
+      { id: 480110, t: "第4章 経費" },
+      { id: 450120, t: "第5章 製造間接費" },
+      { id: 480120, t: "第6章 部門別計算" },
+      { id: 450121, t: "第7章 個別原価計算" },
+      { id: 450132, t: "第8章 総合原価計算" },
+      { id: 480127, t: "第9章 その他の総合原価計算" },
+      { id: 480128, t: "第10章 決算と財務諸表" },
+      { id: 480129, t: "第11章 標準原価計算" },
+      { id: 480142, t: "第12章 直接原価計算" },
+      { id: 540002, t: "第13章 CVP分析" },
+      { id: 540003, t: "第14章 本社工場会計" }
+    ]
+  }
+};
+
 const TIPS = [
   "前夜のタスクを翌朝6:00に5分復習すると定着率が跳ね上がります",
   "通勤中にYouTube音声を流せるなら+30分のバッファになります",
@@ -700,6 +887,46 @@ function loadDayState(d) {
 
 function saveDayState(d, state) {
   store.set('day:' + dateKey(d), JSON.stringify(state));
+}
+
+// ============================================================
+// LECTURE PROGRESS（コース別の視聴済みコマ数）
+// ============================================================
+function lectureProgress(courseId) {
+  const n = parseInt(store.get('lecture:' + courseId), 10);
+  return isNaN(n) ? 0 : n;
+}
+
+function setLectureProgress(courseId, n) {
+  const total = LECTURES[courseId].lessons.length;
+  store.set('lecture:' + courseId, String(Math.max(0, Math.min(total, n))));
+}
+
+// 次に視聴すべき講義のリンク情報を返す。全講義視聴済みならコースページへフォールバック
+function lectureLinkInfo(courseId) {
+  const c = LECTURES[courseId];
+  if (!c) return null;
+  const watched = lectureProgress(courseId);
+  const total = c.lessons.length;
+  if (watched < total) {
+    const next = c.lessons[watched];
+    return {
+      url: LECTURE_BASE + next.id,
+      label: `第${watched + 1}講を開く ↗`,
+      status: `次に視聴: 第${watched + 1}講 ${next.t}`,
+      watched, total, completed: false
+    };
+  }
+  return { url: c.courseUrl, label: 'コースを開く ↗', status: '全講義視聴済み 🎉', watched, total, completed: true };
+}
+
+function lectureAdjHtml(courseId) {
+  const info = lectureLinkInfo(courseId);
+  return `<span class="lecture-status">
+    <button class="lecture-adj" data-course="${courseId}" data-delta="-1" title="視聴位置を1つ戻す">−</button>
+    <span>視聴済み ${info.watched}/${info.total}</span>
+    <button class="lecture-adj" data-course="${courseId}" data-delta="1" title="視聴位置を1つ進める">＋</button>
+  </span>`;
 }
 
 function computeOverallProgress() {
@@ -796,6 +1023,10 @@ function toggleTask(idx) {
     if (task && task.time) {
       state.minutes = Math.max(0, (state.minutes || 0) + (completing ? task.time : -task.time));
     }
+    // 講義タスクの完了/取り消しに連動して視聴済みコマ数を進退させる
+    if (task && task.course && LECTURES[task.course]) {
+      setLectureProgress(task.course, lectureProgress(task.course) + (completing ? 1 : -1));
+    }
   }
   saveDayState(viewDate, state);
   render();
@@ -809,6 +1040,10 @@ function toggleManualTask(idx) {
     // タスク完了/取り消しに連動して学習時間を自動加減算
     if (task.time) {
       state.minutes = Math.max(0, (state.minutes || 0) + (task.done ? task.time : -task.time));
+    }
+    // 講義タスクの完了/取り消しに連動して視聴済みコマ数を進退させる
+    if (task.course && LECTURES[task.course]) {
+      setLectureProgress(task.course, lectureProgress(task.course) + (task.done ? 1 : -1));
     }
   }
   saveDayState(viewDate, state);
@@ -825,7 +1060,7 @@ function deleteManualTask(idx) {
 
 function addExtraLecture(task) {
   const state = loadDayState(viewDate);
-  state.manualTasks.push({ title: task.title, time: task.time, detail: task.detail, url: task.url || '', done: false });
+  state.manualTasks.push({ title: task.title, time: task.time, detail: task.detail, url: task.url || '', course: task.course || '', done: false });
   saveDayState(viewDate, state);
   render();
 }
@@ -1540,8 +1775,11 @@ function render() {
   const ws = document.getElementById('weekend-section');
   if (isWeekend(viewDate) && phase.weekendTasks && phase.weekendTasks.length > 0) {
     const t = phase.weekendTasks[0];
-    const link = t.url ? ` <a href="${t.url}" target="_blank" style="color:inherit;text-decoration:underline">開く</a>` : '';
-    ws.innerHTML = `<div class="weekend-banner"><strong>週末モード: 追加の長時間タスクが利用可能です</strong>${t.title} (${t.time}分)${link}</div>`;
+    const lec = t.course ? lectureLinkInfo(t.course) : null;
+    const linkUrl = lec ? lec.url : t.url;
+    const link = linkUrl ? ` <a href="${linkUrl}" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline">${lec ? escHtml(lec.label) : '開く'}</a>` : '';
+    const lecLine = lec ? `<br>${escHtml(lec.status)} ${lectureAdjHtml(t.course)}` : '';
+    ws.innerHTML = `<div class="weekend-banner"><strong>週末モード: 追加の長時間タスクが利用可能です</strong>${escHtml(t.title)} (${t.time}分)${link}${lecLine}</div>`;
   } else {
     ws.innerHTML = '';
   }
@@ -1554,19 +1792,24 @@ function render() {
     const done = state.done.includes(idx);
     const div = document.createElement('div');
     div.className = 'todo' + (done ? ' done' : '');
-    const taskUrl = t.url || phase.practiceUrl;
-    const linkLabel = t.url ? 'リソースを開く ↗' : '問題集を開く ↗';
-    const link = taskUrl ? `<a class="todo-link" href="${taskUrl}" target="_blank" rel="noopener">${linkLabel}</a>` : '';
-    const extraBtn = t.title.includes('講義') ? `<button class="extra-lecture-btn">＋もう1コマ</button>` : '';
+    const lec = t.course ? lectureLinkInfo(t.course) : null;
+    const taskUrl = lec ? lec.url : (t.url || phase.practiceUrl);
+    const linkLabel = lec ? lec.label : (t.url ? 'リソースを開く ↗' : '問題集を開く ↗');
+    const link = taskUrl ? `<a class="todo-link" href="${escHtml(taskUrl)}" target="_blank" rel="noopener">${escHtml(linkLabel)}</a>` : '';
+    const lecLine = lec ? `<p class="todo-meta todo-lecture">${escHtml(lec.status)}</p>` : '';
+    const hasExtra = !!lec || t.title.includes('講義');
+    const extraBtn = hasExtra ? `<button class="extra-lecture-btn">＋もう1コマ</button>` : '';
+    const adj = lec ? lectureAdjHtml(t.course) : '';
     div.innerHTML = `
       <input type="checkbox" ${done ? 'checked' : ''} />
       <div class="todo-body">
         <p class="todo-title">${escHtml(t.title)}</p>
         <p class="todo-meta">${escHtml(t.detail)} ・ 目安 ${t.time}分</p>
-        <div class="todo-actions">${link}${extraBtn}</div>
+        ${lecLine}
+        <div class="todo-actions">${link}${extraBtn}${adj}</div>
       </div>`;
     div.querySelector('input').addEventListener('change', () => toggleTask(idx));
-    if (t.title.includes('講義')) {
+    if (hasExtra) {
       div.querySelector('.extra-lecture-btn').addEventListener('click', () => addExtraLecture(t));
     }
     list.appendChild(div);
@@ -1576,7 +1819,11 @@ function render() {
   state.manualTasks.forEach((t, idx) => {
     const div = document.createElement('div');
     div.className = 'todo manual' + (t.done ? ' done' : '');
-    const link = t.url ? `<a class="todo-link" href="${t.url}" target="_blank" rel="noopener">リソースを開く ↗</a>` : '';
+    // 講義の手動タスク（＋もう1コマ）は現在の視聴位置のリンクを常に指す
+    const lec = t.course && !t.done ? lectureLinkInfo(t.course) : null;
+    const linkUrl = lec ? lec.url : t.url;
+    const linkLabel = lec ? lec.label : 'リソースを開く ↗';
+    const link = linkUrl ? `<a class="todo-link" href="${escHtml(linkUrl)}" target="_blank" rel="noopener">${escHtml(linkLabel)}</a>` : '';
     div.innerHTML = `
       <input type="checkbox" ${t.done ? 'checked' : ''} />
       <div class="todo-body">
@@ -1680,15 +1927,18 @@ function showPhaseDetail(idx) {
   const content = document.getElementById('phase-modal-content');
 
   function taskItemHtml(t, isWeekend) {
-    const taskUrl = t.url || phase.practiceUrl;
-    const linkLabel = t.url ? 'リソースを開く ↗' : '問題集を開く ↗';
+    const lec = t.course ? lectureLinkInfo(t.course) : null;
+    const taskUrl = lec ? lec.url : (t.url || phase.practiceUrl);
+    const linkLabel = lec ? lec.label : (t.url ? 'リソースを開く ↗' : '問題集を開く ↗');
     const link = taskUrl
-      ? `<a class="todo-link" href="${escHtml(taskUrl)}" target="_blank" rel="noopener">${linkLabel}</a>`
+      ? `<a class="todo-link" href="${escHtml(taskUrl)}" target="_blank" rel="noopener">${escHtml(linkLabel)}</a>`
       : '';
+    const lecLine = lec ? `<div class="phase-task-desc">${escHtml(lec.status)}（視聴済み ${lec.watched}/${lec.total}）</div>` : '';
     return `
       <div class="phase-task-item${isWeekend ? ' weekend' : ''}">
         <div class="phase-task-name">${escHtml(t.title)}</div>
         ${t.detail ? `<div class="phase-task-desc">${escHtml(t.detail)}</div>` : ''}
+        ${lecLine}
         <div class="phase-task-meta"><span>目安 ${t.time}分</span>${link}</div>
       </div>`;
   }
@@ -1753,6 +2003,16 @@ document.addEventListener('keydown', e => {
     document.getElementById('phase-modal').style.display = 'none';
     document.body.style.overflow = '';
   }
+});
+
+// 視聴位置の手動調整（−/＋）。動的生成される要素のためデリゲートで拾う
+document.addEventListener('click', e => {
+  const btn = e.target.closest('.lecture-adj');
+  if (!btn) return;
+  const courseId = btn.dataset.course;
+  if (!LECTURES[courseId]) return;
+  setLectureProgress(courseId, lectureProgress(courseId) + parseInt(btn.dataset.delta, 10));
+  render();
 });
 
 // ============================================================
