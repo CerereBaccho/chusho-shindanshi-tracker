@@ -38,6 +38,35 @@ function Fact({ label, value }: { label: string; value: string }) {
   );
 }
 
+/**
+ * 決断の直前に、実在する数値だけで社会的証明と締切を再掲する。
+ * Notion に値が無いものは一切出さない（捏造した希少性は逆効果のため）。
+ */
+function ProofStrip({
+  attendingCount,
+  seatsLeft,
+  remainingDays,
+}: {
+  attendingCount: number | null;
+  seatsLeft: number | null;
+  remainingDays: number | null;
+}) {
+  const facts: string[] = [];
+  if (attendingCount !== null && attendingCount > 0) {
+    facts.push(`すでに${attendingCount}名が出席と回答しています`);
+  }
+  if (seatsLeft !== null) {
+    facts.push(`残り${seatsLeft}席`);
+  }
+  if (remainingDays !== null && remainingDays >= 0) {
+    facts.push(`回答期限まであと${remainingDays}日`);
+  }
+  if (facts.length === 0) return null;
+  return (
+    <p className="proofStrip">{facts.join(" ・ ")}</p>
+  );
+}
+
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="details__row">
@@ -210,6 +239,11 @@ export default async function Page() {
             必須はお名前・メールアドレス・出欠の3つだけです。1分ほどで終わります。
           </p>
           <div className="card">
+            <ProofStrip
+              attendingCount={attendingCount}
+              seatsLeft={seatsLeft}
+              remainingDays={remainingDays}
+            />
             <RsvpForm />
           </div>
         </div>
@@ -235,6 +269,19 @@ export default async function Page() {
               <h3 className="faq__question">会費には何が含まれますか？</h3>
               <p className="faq__answer">
                 {event?.feeNote ?? "内訳は決まりしだい、この欄に掲載します。"}
+              </p>
+            </li>
+            <li className="faq__item">
+              <h3 className="faq__question">顔を合わせづらい人がいます。</h3>
+              <p className="faq__answer">
+                席順などで配慮できることがあります。回答フォームのメッセージ欄か、幹事宛のメールで
+                お知らせください。内容は幹事だけが確認し、一覧には出しません。
+              </p>
+            </li>
+            <li className="faq__item">
+              <h3 className="faq__question">あとから都合が変わりそうです。</h3>
+              <p className="faq__answer">
+                まずは今の見込みでご回答ください。変更が出たら幹事へご連絡いただければ調整します。
               </p>
             </li>
             <li className="faq__item">

@@ -78,10 +78,38 @@ a {
 
 /* ---------- ヒーロー ---------- */
 .hero {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(160deg, var(--color-navy), #2f5680);
   color: var(--color-surface);
   padding: var(--space-xl) 0 var(--space-lg);
   text-align: center;
+}
+
+/* 柔らかな光の粒で、再会の場らしい温かさを添える */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -30% -10% auto;
+  height: 130%;
+  background:
+    radial-gradient(38rem 20rem at 20% 0%, rgba(246, 231, 221, 0.28), transparent 65%),
+    radial-gradient(28rem 18rem at 85% 15%, rgba(180, 83, 42, 0.32), transparent 70%);
+  pointer-events: none;
+}
+
+.hero > .container {
+  position: relative;
+}
+
+/* 見出しの下に細い罫を引き、扉のような佇まいにする */
+.hero__title::after {
+  content: "";
+  display: block;
+  width: 3rem;
+  height: 2px;
+  margin: var(--space-md) auto 0;
+  background: var(--color-accent);
 }
 
 .hero__eyebrow {
@@ -350,6 +378,18 @@ a {
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-md);
   color: var(--color-ink-muted);
+  text-align: center;
+}
+
+/* 決断の直前に置く社会的証明。実在する数値があるときだけ表示される。 */
+.proofStrip {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: var(--color-accent-soft);
+  color: var(--color-accent-strong);
+  font-size: 0.9375rem;
+  font-weight: 700;
   text-align: center;
 }
 
