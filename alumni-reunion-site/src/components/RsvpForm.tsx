@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   ATTENDANCE_OPTIONS,
@@ -28,6 +28,35 @@ export function RsvpForm() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   // 二重送信防止。state の反映を待たずに同期的に弾く。
   const submittingRef = useRef(false);
+  const formRef = useRef<HTMLFormElement>(null);
+
+  // 検証順。最初にエラーになった項目へ視線を戻すために使う。
+  const FIELD_ORDER: FieldName[] = [
+    "name",
+    "email",
+    "attendance",
+    "maidenName",
+    "graduationYear",
+    "className",
+    "message",
+  ];
+
+  /**
+   * 最初のエラー項目へフォーカスする。
+   * 任意項目は折りたたみの中にあるため、閉じたままだとエラーが見えない。必ず開いてから移動する。
+   */
+  const focusFirstError = useCallback((found: FieldErrors) => {
+    const target = FIELD_ORDER.find((field) => found[field]);
+    if (!target) return;
+    // エラー表示が描画されてから移動する
+    requestAnimationFrame(() => {
+      const element = formRef.current?.querySelector<HTMLElement>(`[name="${target}"]`);
+      if (!element) return;
+      element.closest("details")?.setAttribute("open", "");
+      element.focus({ preventScroll: true });
+      element.scrollIntoView({ block: "center", behavior: "smooth" });
+    });
+  }, []);
 
   const isSubmitting = status.kind === "submitting";
 
@@ -62,6 +91,7 @@ export function RsvpForm() {
         message: true,
       });
       setStatus({ kind: "error", message: "入力内容をご確認ください。" });
+      focusFirstError(found);
       return;
     }
 
@@ -79,7 +109,10 @@ export function RsvpForm() {
         | null;
 
       if (!response.ok || !payload?.ok) {
-        if (payload?.errors) setErrors(payload.errors);
+        if (payload?.errors) {
+          setErrors(payload.errors);
+          focusFirstError(payload.errors);
+        }
         setStatus({
           kind: "error",
           message: payload?.message ?? "送信に失敗しました。時間をおいて再度お試しください。",
@@ -126,7 +159,7 @@ export function RsvpForm() {
   }
 
   return (
-    <form className="form" onSubmit={handleSubmit} noValidate>
+    <form className="form" ref={formRef} onSubmit={handleSubmit} noValidate>
       <div className="field">
         <label className="field__label" htmlFor="rsvp-name">
           お名前
@@ -297,6 +330,9 @@ export function RsvpForm() {
       <button className="button button--block" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "送信中…" : "この内容で回答する"}
       </button>
+      <p className="field__hint" style={{ textAlign: "center" }}>
+        自動の確認メールは送られません。内容の変更や取り消しは、幹事までご連絡ください。
+      </p>
 
       {/* 成功・失敗のどちらも必ず表示する */}
       <div aria-live="polite">
